@@ -18,9 +18,11 @@ package org.geotools.arcsde.data;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 
@@ -41,6 +43,7 @@ import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
+import org.opengis.feature.type.PropertyDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 
@@ -62,8 +65,8 @@ import com.vividsolutions.jts.geom.Polygon;
  * @version $Id$
  */
 public class FilterTest extends TestCase {
-    private static final Comparator FEATURE_COMPARATOR = new Comparator() {
-        public int compare(Object o1, Object o2) {
+    private static final Comparator<SimpleFeature> FEATURE_COMPARATOR = new Comparator<SimpleFeature>() {
+        public int compare(SimpleFeature o1, SimpleFeature o2) {
             Feature f1 = (Feature) o1;
             Feature f2 = (Feature) o2;
 
@@ -160,16 +163,61 @@ public class FilterTest extends TestCase {
     }
 
     /**
-     * DOCUMENT ME!
+     * Are the two collections similar?
      * 
-     * @param c1
-     *            DOCUMENT ME!
-     * @param c2
-     *            DOCUMENT ME!
-     * 
-     * @return DOCUMENT ME!
+     * @param c1 Collection first
+     * @param c2 Collection second
+     * @return true if they have the same content
      */
-    private boolean compareFeatureLists(Collection c1, Collection c2) {
+    private void assertFeatureListsSimilar(Collection<SimpleFeature> c1, Collection<SimpleFeature> c2) {
+        assertEquals( "Actual feature collection was not the expected size", c1.size(), c2.size());
+        
+        ArrayList<SimpleFeature> al1 = new ArrayList<SimpleFeature>(c1);
+        ArrayList<SimpleFeature> al2 = new ArrayList<SimpleFeature>(c2);
+        Collections.sort(al1, FEATURE_COMPARATOR);
+        Collections.sort(al2, FEATURE_COMPARATOR);
+        
+        int n = c1.size();
+
+        for (int i = 0; i < n; i++) {
+            Feature f1 = (Feature) al1.get(i);
+            Feature f2 = (Feature) al2.get(i);
+            if( i== 0 ){
+                assertEquals( "Feature Type", f1.getType(), f2.getType() );
+            }
+            assertEquals( "Feature["+i+"] identifiers Equal", f1.getID(), f2.getID() );
+            if( !f1.equals( f2 )){
+                // go through properties and figure out differneces...
+                for( PropertyDescriptor property : f1.getType().getProperties() ){
+                    String name = property.getName().getLocalPart();
+                    Object value1 = f1.getProperty( name ).getValue();
+                    Object value2 = f2.getProperty( name ).getValue();
+                    if( value1 instanceof Calendar ) {
+                        continue;
+                    }
+                    if( value1 instanceof Date) {
+                        continue;
+                    }
+                    
+                    if( value1 instanceof Geometry ){
+                        // jts geometry is not my friend
+                        assertTrue( "Feature["+i+"]."+name+" geometry", ((Geometry)value1).equals( (Geometry) value2 ) );    
+                    }
+                    else {
+                        assertEquals( "Feature["+i+"]."+name, value1, value2 );
+                    }
+                }
+            }            
+        }
+    }
+    /**
+     * Are the two collections similar?
+     * 
+     * @param c1 Collection first
+     * @param c2 Collection second
+     * @return true if they have the same content
+     */
+    private boolean compareFeatureLists2(Collection<SimpleFeature> c1, Collection<SimpleFeature> c2) {
         System.err.println("Collection 1 size: " + c1.size());
         System.err.println("Collection 2 size: " + c2.size());
 
@@ -179,8 +227,8 @@ public class FilterTest extends TestCase {
             return false;
         }
 
-        ArrayList al1 = new ArrayList(c1);
-        ArrayList al2 = new ArrayList(c2);
+        ArrayList<SimpleFeature> al1 = new ArrayList<SimpleFeature>(c1);
+        ArrayList<SimpleFeature> al2 = new ArrayList<SimpleFeature>(c2);
         Collections.sort(al1, FEATURE_COMPARATOR);
         Collections.sort(al2, FEATURE_COMPARATOR);
 
@@ -201,7 +249,6 @@ public class FilterTest extends TestCase {
 
         return true;
     }
-
     /**
      * DOCUMENT ME!
      * 
@@ -275,7 +322,7 @@ public class FilterTest extends TestCase {
      *             DOCUMENT ME!
      */
     public void testContainsFilter() throws Exception {
-        FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
+        FeatureType ft = this.dataStore.getSchema(testData.getTemp_table());
 
         // Build the filter
         double minx = 106.6666;
@@ -296,7 +343,7 @@ public class FilterTest extends TestCase {
      *             DOCUMENT ME!
      */
     public void testBBoxFilter() throws Exception {
-        FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
+        FeatureType ft = this.dataStore.getSchema(testData.getTemp_table());
 
         // Build the filter
         double minx = 106.6337;
@@ -315,7 +362,7 @@ public class FilterTest extends TestCase {
      *             DOCUMENT ME!
      */
     public void testIntersectsFilter() throws Exception {
-        FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
+        FeatureType ft = this.dataStore.getSchema(testData.getTemp_table());
 
         // Build the filter
         double minx = 106.6337;
@@ -335,7 +382,7 @@ public class FilterTest extends TestCase {
      *             DOCUMENT ME!
      */
     public void testOverlapsFilter() throws Exception {
-        FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
+        FeatureType ft = this.dataStore.getSchema(testData.getTemp_table());
 
         // Build the filter
         double minx = 106.6337;
@@ -355,7 +402,7 @@ public class FilterTest extends TestCase {
      *             DOCUMENT ME!
      */
     public void testWithinFilter() throws Exception {
-        FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
+        FeatureType ft = this.dataStore.getSchema(testData.getTemp_table());
 
         // Build the filter
         double minx = 106.6337;
@@ -375,7 +422,7 @@ public class FilterTest extends TestCase {
      *             DOCUMENT ME!
      */
     public void testCrossesFilter() throws Exception {
-        FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
+        FeatureType ft = this.dataStore.getSchema(testData.getTemp_table());
 
         // Build the filter
         double minx = 106.6337;
@@ -395,14 +442,15 @@ public class FilterTest extends TestCase {
      *             DOCUMENT ME!
      */
     public void testEqualFilter() throws Exception {
-        FeatureType ft = this.dataStore.getSchema("SDE.SDE.JAKARTA");
-
+        FeatureType ft = this.dataStore.getSchema(testData.getTemp_table());
+        
         // Get a geometry for equality comparison
-        HashSet fidSet = new HashSet();
-        fidSet.add(ff.featureId("SDE.SDE.JAKARTA.101"));
-        Filter fidFilter = ff.id(fidSet);
+        HashSet fidSet = new HashSet();        
+        DefaultQuery defaultQuery = new DefaultQuery(testData.getTemp_table());
+        defaultQuery.setPropertyNames( safePropertyNames(ft));
+        defaultQuery.setMaxFeatures(1);
         FeatureReader<SimpleFeatureType, SimpleFeature> fr = this.dataStore.getFeatureReader(
-                new DefaultQuery("SDE.SDE.JAKARTA", fidFilter), Transaction.AUTO_COMMIT);
+                defaultQuery, Transaction.AUTO_COMMIT);
         SimpleFeature feature = fr.next();
         fr.close();
 
@@ -433,7 +481,8 @@ public class FilterTest extends TestCase {
         System.err.println("****************");
 
         // First, read using the slow, built-in mechanisms
-        DefaultQuery allQuery = new DefaultQuery(testData.getTemp_table());
+        String[] propertyNames = safePropertyNames(ft);
+        DefaultQuery allQuery = new DefaultQuery(testData.getTemp_table(), Filter.INCLUDE, propertyNames );
         System.err.println("Performing slow read...");
 
         long startTime = System.currentTimeMillis();
@@ -452,7 +501,7 @@ public class FilterTest extends TestCase {
         System.err.println("Performing fast read...");
         startTime = System.currentTimeMillis();
 
-        DefaultQuery filteringQuery = new DefaultQuery(testData.getTemp_table(), filter);
+        DefaultQuery filteringQuery = new DefaultQuery(testData.getTemp_table(), filter, safePropertyNames(ft) );
         fr = this.dataStore.getFeatureReader(filteringQuery, Transaction.AUTO_COMMIT);
 
         ArrayList fastResults = new ArrayList();
@@ -461,13 +510,23 @@ public class FilterTest extends TestCase {
         endTime = System.currentTimeMillis();
         System.err.println("Fast read took " + (endTime - startTime) + " milliseconds.");
 
-        boolean result = compareFeatureLists(slowResults, fastResults);
+        assertFeatureListsSimilar(slowResults, fastResults);
+    }
 
-        if (result) {
-            System.err.println("Results were identical.");
-        } else {
-            throw new Exception("Results were different.");
+    private String[] safePropertyNames( FeatureType ft ) {
+        ArrayList<String> names = new ArrayList<String>();
+        for( PropertyDescriptor descriptor : ft.getProperties() ){
+            Class<?> binding = descriptor.getType().getBinding();
+            if( Calendar.class.equals( binding )){
+                continue;
+            }
+            if( Date.class.equals( binding )){
+                continue;
+            }
+            names.add( descriptor.getName().getLocalPart() );            
         }
+        String[] propertyNames = names.toArray(new String[names.size()]);
+        return propertyNames;
     }
 
     /**
