@@ -36,7 +36,7 @@ public interface ArcSdeVersionHandler {
      * @param streamOperation
      * @throws IOException
      */
-    void setUpStream(Session connection, SeStreamOp streamOperation) throws IOException;
+    void setUpStream(Session session, SeStreamOp streamOperation) throws IOException;
 
     /**
      * Called when a single edit operation that was settled up with {@link #setUpStream(SeStreamOp)}
@@ -90,7 +90,7 @@ public interface ArcSdeVersionHandler {
             // do nothing, not a versioned table
         }
 
-        public void setUpStream(Session connection, SeStreamOp streamOperation)
+        public void setUpStream(Session session, SeStreamOp streamOperation)
                 throws IOException {
             // do nothing, not a versioned table
         }

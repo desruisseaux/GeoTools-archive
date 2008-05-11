@@ -78,7 +78,7 @@ class ArcSDEQuery {
      * NOTE: this member is package visible only for unit test pourposes
      * </p>
      */
-    final Session connection;
+    final Session session;
 
     /**
      * The exact feature type this query is about to request from the arcsde server. It could have
@@ -112,7 +112,7 @@ class ArcSDEQuery {
     /**
      * Creates a new SDEQuery object.
      * 
-     * @param connection the connection attached to the life cycle of this query
+     * @param session the session attached to the life cycle of this query
      * @param schema the schema with all the attributes as expected.
      * @param filterSet DOCUMENT ME!
      * @param versioningHandler used to transparently set up SeQuery streams pointing to the propper
@@ -120,12 +120,12 @@ class ArcSDEQuery {
      * @throws DataSourceException DOCUMENT ME!
      * @see prepareQuery
      */
-    private ArcSDEQuery(final Session connection,
+    private ArcSDEQuery(final Session session,
                         final SimpleFeatureType schema,
                         final FilterSet filterSet,
                         final FIDReader fidReader,
                         ArcSdeVersionHandler versioningHandler) throws DataSourceException {
-        this.connection = connection;
+        this.session = session;
         this.schema = schema;
         this.filters = filterSet;
         this.fidReader = fidReader;
@@ -136,7 +136,7 @@ class ArcSDEQuery {
      * Creates a Query to be executed over a registered ArcSDE layer (whether it is from a table or
      * a spatial view).
      * 
-     * @param conn the connection the query works over. As its managed by the calling code its the
+     * @param session the session the query works over. As its managed by the calling code its the
      *            calling code responsibility to close it when done.
      * @param fullSchema
      * @param query
@@ -145,7 +145,7 @@ class ArcSDEQuery {
      * @return
      * @throws IOException
      */
-    public static ArcSDEQuery createQuery(final Session conn,
+    public static ArcSDEQuery createQuery(final Session session,
             final SimpleFeatureType fullSchema,
             final Query query,
             final FIDReader fidReader,
@@ -156,14 +156,14 @@ class ArcSDEQuery {
         LOGGER.fine("Creating new ArcSDEQuery");
 
         final String typeName = fullSchema.getTypeName();
-        final SeLayer sdeLayer = conn.getLayer(typeName);
+        final SeLayer sdeLayer = session.getLayer(typeName);
         final SimpleFeatureType querySchema = getQuerySchema(query, fullSchema);
         // create the set of filters to work over
         final ArcSDEQuery.FilterSet filters = new ArcSDEQuery.FilterSet(sdeLayer, filter,
                 querySchema, null, null, fidReader);
 
         final ArcSDEQuery sdeQuery;
-        sdeQuery = new ArcSDEQuery(conn, querySchema, filters, fidReader, versioningHandler);
+        sdeQuery = new ArcSDEQuery(session, querySchema, filters, fidReader, versioningHandler);
         return sdeQuery;
     }
 
@@ -175,7 +175,7 @@ class ArcSDEQuery {
      * @throws IOException see <i>throws DataSourceException</i> bellow.
      * @see ArcSDEDataStore#registerView(String, PlainSelect)
      */
-    public static ArcSDEQuery createInprocessViewQuery(final Session conn,
+    public static ArcSDEQuery createInprocessViewQuery(final Session session,
             final SimpleFeatureType fullSchema,
             final Query query,
             final SeQueryInfo definitionQuery,
@@ -202,7 +202,7 @@ class ArcSDEQuery {
         if (layerName.indexOf(" AS") > 0) {
             layerName = layerName.substring(0, layerName.indexOf(" AS"));
         }
-        sdeLayer = conn.getLayer(layerName);
+        sdeLayer = session.getLayer(layerName);
 
         final SimpleFeatureType querySchema = getQuerySchema(query, fullSchema);
         // create the set of filters to work over
@@ -210,7 +210,7 @@ class ArcSDEQuery {
                 querySchema, definitionQuery, viewSelectStatement, fidReader);
 
         final ArcSDEQuery sdeQuery;
-        sdeQuery = new ArcSDEQuery(conn, querySchema, filters, fidReader,
+        sdeQuery = new ArcSDEQuery(session, querySchema, filters, fidReader,
                 ArcSdeVersionHandler.NONVERSIONED_HANDLER);
         return sdeQuery;
     }
@@ -345,13 +345,13 @@ class ArcSDEQuery {
      */
     private SeQuery createSeQueryForFetch(String[] propertyNames) throws SeException, IOException {
         if (LOGGER.isLoggable(Level.FINEST)) {
-            LOGGER.finest("constructing new sql query with connection: " + connection
+            LOGGER.finest("constructing new sql query with connection: " + session
                     + ", propnames: " + java.util.Arrays.asList(propertyNames)
                     + " sqlConstruct where clause: '" + this.filters.getSeSqlConstruct().getWhere()
                     + "'");
         }
 
-        SeQuery seQuery = connection.createSeQuery();
+        SeQuery seQuery = session.createSeQuery();
         setQueryVersionState(seQuery);
 
         SeQueryInfo qInfo = filters.getQueryInfo(propertyNames);
@@ -368,7 +368,7 @@ class ArcSDEQuery {
             // SHAPE.fid as a last resort to get a fid
             if (-51 == e.getSeError().getSdeError()) {
                 seQuery.close();
-                seQuery = connection.createSeQuery(propertyNames, filters.getSeSqlConstruct());
+                seQuery = session.createSeQuery(propertyNames, filters.getSeSqlConstruct());
                 setQueryVersionState(seQuery);
                 seQuery.prepareQuery();
             } else {
@@ -444,7 +444,7 @@ class ArcSDEQuery {
     private SeQuery createSeQueryForQueryInfo(final boolean setReturnGeometryMasks)
             throws SeException, IOException {
 
-        SeQuery seQuery = connection.createSeQuery();
+        SeQuery seQuery = session.createSeQuery();
         setQueryVersionState(seQuery);
         SeFilter[] spatialConstraints = this.filters.getSpatialFilters();
 
@@ -464,7 +464,7 @@ class ArcSDEQuery {
      * @throws IOException
      */
     private void setQueryVersionState(SeQuery seQuery) throws IOException {
-        versioningHandler.setUpStream(connection, seQuery);
+        versioningHandler.setUpStream(session, seQuery);
     }
 
     /**
@@ -488,7 +488,7 @@ class ArcSDEQuery {
     /**
      * Convenient method to just calculate the result count of a given query.
      */
-    public static int calculateResultCount(final Session connection,
+    public static int calculateResultCount(final Session session,
             final FeatureTypeInfo typeInfo,
             final Query query,
             final ArcSdeVersionHandler versioningHandler) throws IOException {
@@ -500,11 +500,11 @@ class ArcSDEQuery {
             if (typeInfo.isInProcessView()) {
                 final SeQueryInfo definitionQuery = typeInfo.getSdeDefinitionQuery();
                 final PlainSelect viewSelectStatement = typeInfo.getDefinitionQuery();
-                countQuery = createInprocessViewQuery(connection, fullSchema, query,
+                countQuery = createInprocessViewQuery(session, fullSchema, query,
                         definitionQuery, viewSelectStatement);
             } else {
                 final FIDReader fidStrategy = typeInfo.getFidStrategy();
-                countQuery = createQuery(connection, fullSchema, query, fidStrategy,
+                countQuery = createQuery(session, fullSchema, query, fidStrategy,
                         versioningHandler);
             }
             count = countQuery.calculateResultCount();
@@ -519,7 +519,7 @@ class ArcSDEQuery {
     /**
      * Convenient method to just calculate the resulting bound box of a given query.
      */
-    public static Envelope calculateQueryExtent(final Session connection,
+    public static Envelope calculateQueryExtent(final Session session,
             final FeatureTypeInfo typeInfo,
             final Query query,
             final ArcSdeVersionHandler versioningHandler) throws IOException {
@@ -537,10 +537,10 @@ class ArcSDEQuery {
         if (typeInfo.isInProcessView()) {
             final SeQueryInfo definitionQuery = typeInfo.getSdeDefinitionQuery();
             final PlainSelect viewSelectStatement = typeInfo.getDefinitionQuery();
-            boundsQuery = createInprocessViewQuery(connection, fullSchema, realQuery,
+            boundsQuery = createInprocessViewQuery(session, fullSchema, realQuery,
                     definitionQuery, viewSelectStatement);
         } else {
-            boundsQuery = createQuery(connection, fullSchema, realQuery, FIDReader.NULL_READER,
+            boundsQuery = createQuery(session, fullSchema, realQuery, FIDReader.NULL_READER,
                     versioningHandler);
         }
 

@@ -60,12 +60,12 @@ public class FloatBandCopierTest {
     public void testReadAlignedFloatTile() throws Exception {
         final String tableName = rasterTestData.getFloatRasterTableName();
 
-        Session scon = null;
+        Session session = null;
         try {
             ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
 
-            scon = pool.getConnection();
-            SeQuery q = new SeQuery(scon.unWrap(), new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+            session = pool.getConnection();
+            SeQuery q = new SeQuery(session.unWrap(), new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
             SeRow r = q.fetch();
@@ -116,8 +116,8 @@ public class FloatBandCopierTest {
         } catch (SeException se) {
             LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
         } finally {
-            if (scon != null)
-                scon.close();
+            if (session != null)
+                session.close();
         }
     }
 }

@@ -57,7 +57,7 @@ public class QueryInfoParser {
     private static final Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger(QueryInfoParser.class.getPackage().getName());
 
-    public static SeQueryInfo parse(Session conn, PlainSelect select) throws SeException,
+    public static SeQueryInfo parse(Session session, PlainSelect select) throws SeException,
             IOException {
         String[] columns = null;
         String[] tables = null;
@@ -70,7 +70,7 @@ public class QueryInfoParser {
 
         // obtain needed SeQueryInfo components
 
-        columns = getColumns(conn, select.getSelectItems());
+        columns = getColumns(session, select.getSelectItems());
         tables = getTables(select.getFromItems());
 
         Expression whereClause = select.getWhere();
@@ -133,7 +133,7 @@ public class QueryInfoParser {
      *         contains only an
      *         {@link net.sf.jsqlparser.statement.select.AllColumns}
      */
-    private static String[] getColumns(Session conn, List selectItems) throws SeException {
+    private static String[] getColumns(Session session, List selectItems) throws SeException {
         if (selectItems == null || selectItems.size() == 0) {
             return null;
         }
@@ -147,7 +147,7 @@ public class QueryInfoParser {
             } else if (item instanceof AllTableColumns) {
                 AllTableColumns allTableCols = (AllTableColumns) item;
                 Table table = allTableCols.getTable();
-                List tableColNames = getTableColumns(conn, table);
+                List tableColNames = getTableColumns(session, table);
                 colNames.addAll(tableColNames);
             } else if (item instanceof SelectExpressionItem) {
                 String stringItem = item.toString();
@@ -161,10 +161,10 @@ public class QueryInfoParser {
         return columns;
     }
 
-    private static List getTableColumns(Session conn, Table table) throws SeException {
+    private static List getTableColumns(Session session, Table table) throws SeException {
         List colNames = new ArrayList();
         String tableName = table.getSchemaName() + "." + table.getName();
-        SeTable seTable = conn.createSeTable( tableName);
+        SeTable seTable = session.createSeTable( tableName);
         SeColumnDefinition[] cols = seTable.describe();
         for (int i = 0; i < cols.length; i++) {
             String colName = cols[i].getName();

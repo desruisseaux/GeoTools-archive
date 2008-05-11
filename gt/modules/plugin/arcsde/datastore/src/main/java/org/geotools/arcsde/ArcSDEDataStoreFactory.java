@@ -207,10 +207,10 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
         ArcSDEConnectionPool connPool = poolFactory.createPool(config);
 
         // check to see if our sdk is compatible with this arcsde instance
-        Session conn = null;
+        Session session = null;
         try {
-            conn = connPool.getConnection();
-            SeRelease releaseInfo = conn.getRelease();
+            session = connPool.getConnection();
+            SeRelease releaseInfo = session.getRelease();
             int majVer = releaseInfo.getMajor();
             int minVer = releaseInfo.getMinor();
 
@@ -235,8 +235,8 @@ public class ArcSDEDataStoreFactory implements DataStoreFactorySpi {
                                 + "**************************\n\n");
             }
         } finally {
-            if (conn != null)
-                conn.close();
+            if (session != null)
+                session.close();
         }
 
         String namespaceUri = config.getNamespaceUri();

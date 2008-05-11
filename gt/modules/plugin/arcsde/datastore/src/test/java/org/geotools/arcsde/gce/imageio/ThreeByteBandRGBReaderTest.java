@@ -41,14 +41,14 @@ public class ThreeByteBandRGBReaderTest {
 
         ArcSDEPyramid pyramid;
         String tableName;
-        Session scon = null;
+        Session session = null;
         try {
             tableName = rasterTestData.getRGBRasterTableName();
             SeRasterAttr rattr = rasterTestData.getRasterAttributes(tableName, new Rectangle(0, 0,
                     0, 0), 0, new int[] { 1, 2, 3 });
 
-            scon = rasterTestData.getTestData().getConnectionPool().getConnection();
-            SeRasterColumn rcol = new SeRasterColumn(scon.unWrap(), rattr.getRasterColumnId());
+            session = rasterTestData.getTestData().getConnectionPool().getConnection();
+            SeRasterColumn rcol = new SeRasterColumn(session.unWrap(), rattr.getRasterColumnId());
 
             CoordinateReferenceSystem crs = CRS.decode("EPSG:2805");
             pyramid = new ArcSDEPyramid(rattr, crs);
@@ -61,8 +61,8 @@ public class ThreeByteBandRGBReaderTest {
             LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
             throw se;
         } finally {
-            if (scon != null) {
-                scon.close();
+            if (session != null) {
+                session.close();
             }
         }
     }
@@ -83,9 +83,9 @@ public class ThreeByteBandRGBReaderTest {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(readerProps);
 
-        Session scon = null;
+        Session session = null;
         try {
-            scon = rasterTestData.getTestData().getConnectionPool().getConnection();
+            session = rasterTestData.getTestData().getConnectionPool().getConnection();
 
             SeRasterAttr rattr = rasterTestData.getRasterAttributes(rasterTestData
                     .getRGBRasterTableName(), new Rectangle(0, 0, 0, 0), 0, new int[] { 1, 2, 3 });
@@ -106,7 +106,7 @@ public class ThreeByteBandRGBReaderTest {
 
             ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
             rParam.setSourceBands(new int[] { 1, 2, 3 });
-            rParam.setConnection(scon);
+            rParam.setConnection(session);
             rParam.setSourceRegion(new Rectangle(dataOffset.x, dataOffset.y, w, h));
             image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
             for (int x = 0; x < w; x++) {
@@ -135,8 +135,8 @@ public class ThreeByteBandRGBReaderTest {
         } catch (Exception e) {
             throw e;
         } finally {
-            if (scon != null && !scon.isClosed())
-                scon.close();
+            if (session != null && !session.isClosed())
+                session.close();
         }
     }
 
@@ -151,9 +151,9 @@ public class ThreeByteBandRGBReaderTest {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(readerProps);
 
-        Session scon = null;
+        Session session = null;
         try {
-            scon = rasterTestData.getTestData().getConnectionPool().getConnection();
+            session = rasterTestData.getTestData().getConnectionPool().getConnection();
 
             SeRasterAttr rattr = rasterTestData.getRasterAttributes(rasterTestData
                     .getRGBRasterTableName(), new Rectangle(0, 0, 0, 0), 0, new int[] { 1, 2, 3 });
@@ -176,7 +176,7 @@ public class ThreeByteBandRGBReaderTest {
 
             ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
             rParam.setSourceBands(new int[] { 1, 2, 3 });
-            rParam.setConnection(scon);
+            rParam.setConnection(session);
             rParam.setSourceRegion(new Rectangle(dataOffset.x, dataOffset.y, w, h));
             rParam.setDestination(image);
             rParam.setDestinationOffset(imageOffset);
@@ -200,8 +200,8 @@ public class ThreeByteBandRGBReaderTest {
         } catch (Exception e) {
             throw e;
         } finally {
-            if (scon != null && !scon.isClosed())
-                scon.close();
+            if (session != null && !session.isClosed())
+                session.close();
         }
     }
 
@@ -213,9 +213,9 @@ public class ThreeByteBandRGBReaderTest {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(readerProps);
 
-        Session scon = null;
+        Session session = null;
         try {
-            scon = rasterTestData.getTestData().getConnectionPool().getConnection();
+            session = rasterTestData.getTestData().getConnectionPool().getConnection();
             SeRasterAttr rattr = rasterTestData.getRasterAttributes(rasterTestData
                     .getRGBRasterTableName(), new Rectangle(0, 0, 0, 0), 0, new int[] { 1, 2, 3 });
             ArcSDEPyramid p = new ArcSDEPyramid(rattr, CRS.decode("EPSG:4326"));
@@ -230,7 +230,7 @@ public class ThreeByteBandRGBReaderTest {
 
             ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
             rParam.setSourceBands(new int[] { 1, 2, 3 });
-            rParam.setConnection(scon);
+            rParam.setConnection(session);
             rParam.setSourceRegion(new Rectangle(p.getPyramidLevel(0).getSize()));
             image = new BufferedImage(p.getPyramidLevel(0).getSize().width, p.getPyramidLevel(0)
                     .getSize().height, BufferedImage.TYPE_3BYTE_BGR);
@@ -249,8 +249,8 @@ public class ThreeByteBandRGBReaderTest {
         } catch (Exception e) {
             throw e;
         } finally {
-            if (scon != null && !scon.isClosed())
-                scon.close();
+            if (session != null && !session.isClosed())
+                session.close();
         }
     }
 }

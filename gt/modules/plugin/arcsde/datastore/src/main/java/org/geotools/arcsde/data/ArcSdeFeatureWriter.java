@@ -80,7 +80,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
     /**
      * Connection to hold while this feature writer is alive.
      */
-    protected Session connection;
+    protected Session session;
 
     /**
      * Reader for streamed access to filtered content this writer acts upon.
@@ -131,21 +131,21 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
     public ArcSdeFeatureWriter(final FIDReader fidReader,
                                final SimpleFeatureType featureType,
                                final FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent,
-                               final Session connection,
+                               final Session session,
                                final FeatureListenerManager listenerManager,
                                final ArcSdeVersionHandler versionHandler) throws IOException {
 
         assert fidReader != null;
         assert featureType != null;
         assert filteredContent != null;
-        assert connection != null;
+        assert session != null;
         assert listenerManager != null;
         assert versionHandler != null;
 
         this.fidReader = fidReader;
         this.featureType = featureType;
         this.filteredContent = filteredContent;
-        this.connection = connection;
+        this.session = session;
         this.listenerManager = listenerManager;
         this.featureBuilder = new SimpleFeatureBuilder(featureType);
         this.versionHandler = versionHandler;
@@ -166,16 +166,16 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
         SeStreamOp streamOp;
 
         if (SeInsert.class == streamType) {
-            streamOp = connection.createSeInsert();
+            streamOp = session.createSeInsert();
         } else if (SeUpdate.class == streamType) {
-            streamOp = connection.createSeUpdate();
+            streamOp = session.createSeUpdate();
         } else if (SeDelete.class == streamType) {
-            streamOp = connection.createSeDelete();
+            streamOp = session.createSeDelete();
         } else {
             throw new IllegalArgumentException("Unrecognized stream type: " + streamType);
         }
 
-        versionHandler.setUpStream(connection, streamOp);
+        versionHandler.setUpStream(session, streamOp);
 
         return streamOp;
     }
@@ -202,9 +202,9 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
         }
 
         // let repeatedly calling close() be inoffensive
-        if (connection != null) {
-            connection.close();
-            connection = null;
+        if (session != null) {
+            session.close();
+            session = null;
         }
     }
 
@@ -257,10 +257,10 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
         // deletes are executed immediately. We set up a transaction
         // if in autocommit mode to be committed or rolled back on this same
         // method if something happens bellow.
-        final boolean handleTransaction = !connection.isTransactionActive();
+        final boolean handleTransaction = !session.isTransactionActive();
         if (handleTransaction) {
             try {
-                connection.startTransaction();
+                session.startTransaction();
             } catch (SeException e) {
                 throw new ArcSdeException("Can't initiate delete transaction", e);
             }
@@ -277,7 +277,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
             // database. The application does not need to call execute()
             seDelete.byId(qualifiedName, objectID);
             if (handleTransaction) {
-                connection.commitTransaction();
+                session.commitTransaction();
             }
             fireRemoved(feature);
             versionHandler.editOperationWritten(seDelete);
@@ -285,7 +285,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
             versionHandler.editOperationFailed(seDelete);
             if (handleTransaction) {
                 try {
-                    connection.rollbackTransaction();
+                    session.rollbackTransaction();
                 } catch (SeException e1) {
                     LOGGER.log(Level.SEVERE, "Unrecoverable error rolling back delete transaction",
                             new ArcSdeException("Unable to rollback", e));
@@ -386,7 +386,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      * 
      * @param modifiedFeature the newly create Feature to insert.
      * @param layer the layer where to insert the feature.
-     * @param connection the connection to use for the insert operation. Its auto commit mode
+     * @param session the connection to use for the insert operation. Its auto commit mode
      *            determines whether the operation takes effect immediately or not.
      * @throws IOException
      * @throws SeException
@@ -437,7 +437,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
      * 
      * @param newFeature the newly create Feature to insert.
      * @param layer the layer where to insert the feature.
-     * @param connection the connection to use for the insert operation. Its auto commit mode
+     * @param session the connection to use for the insert operation. Its auto commit mode
      *            determines whether the operation takes effect immediately or not.
      * @throws SeException if thrown by any sde stream method
      * @throws IOException
@@ -751,7 +751,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
         if (this.cachedTable == null) {
             // final ArcSDEPooledConnection connection = getConnection();
             final String typeName = this.featureType.getTypeName();
-            final SeTable table = connection.getTable(typeName);
+            final SeTable table = session.getTable(typeName);
             this.cachedTable = table;
         }
         return this.cachedTable;
@@ -761,7 +761,7 @@ abstract class ArcSdeFeatureWriter implements FeatureWriter<SimpleFeatureType, S
         if (this.cachedLayer == null) {
             // final ArcSDEPooledConnection connection = getConnection();
             final String typeName = this.featureType.getTypeName();
-            final SeLayer layer = connection.getLayer(typeName);
+            final SeLayer layer = session.getLayer(typeName);
             this.cachedLayer = layer;
         }
         return this.cachedLayer;

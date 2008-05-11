@@ -39,14 +39,14 @@ class ColumnQualifier {
     /**
      * DOCUMENT ME!
      * 
-     * @param conn
+     * @param session
      *            DOCUMENT ME!
      * @param column
      *            DOCUMENT ME!
      * 
      * @return DOCUMENT ME!
      */
-    public static Column qualify(Session conn, Map tableAliases, Column column) {
+    public static Column qualify(Session session, Map tableAliases, Column column) {
         Table table = column.getTable();
 
         String columnName = column.getColumnName();
@@ -57,7 +57,7 @@ class ColumnQualifier {
 
         if (unaliasedTable == null) {
             // not an aliased table, qualify it
-            qualifiedTable = TableQualifier.qualify(conn, table);
+            qualifiedTable = TableQualifier.qualify(session, table);
         } else {
             // AllTableColumns is refering to an aliased table in the FROM
             // clause,

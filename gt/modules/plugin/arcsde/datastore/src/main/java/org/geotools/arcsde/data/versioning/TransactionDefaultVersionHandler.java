@@ -38,7 +38,7 @@ import com.esri.sde.sdk.client.SeVersion;
  */
 public class TransactionDefaultVersionHandler implements ArcSdeVersionHandler {
 
-    private final Session connection;
+    private final Session session;
 
     private final SeVersion defaultVersion;
 
@@ -48,10 +48,10 @@ public class TransactionDefaultVersionHandler implements ArcSdeVersionHandler {
 
     private SeState transactionState;
 
-    public TransactionDefaultVersionHandler(final Session connection) throws IOException {
-        this.connection = connection;
+    public TransactionDefaultVersionHandler(final Session session) throws IOException {
+        this.session = session;
         try {
-            defaultVersion = connection.createSeVersion(SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME);
+            defaultVersion = session.createSeVersion(SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME);
             defaultVersion.getInfo();
             // initialStateId = defaultVersion.getStateId();
         } catch (SeException e) {
@@ -64,16 +64,16 @@ public class TransactionDefaultVersionHandler implements ArcSdeVersionHandler {
      * 
      * @see ArcSdeVersionHandler#
      */
-    public void setUpStream(final Session connection, SeStreamOp streamOperation)
+    public void setUpStream(final Session session, SeStreamOp streamOperation)
             throws IOException {
         if (transactionState == null) {
             try {
                 defaultVersion.getInfo();
-                SeState parentState = connection.createSeState(defaultVersion.getStateId());
+                SeState parentState = session.createSeState(defaultVersion.getStateId());
                 if (parentState.isOpen()) {
                     parentState.close();
                 }
-                transactionState = connection.createSeState();
+                transactionState = session.createSeState();
                 transactionState.create(parentState.getId());
             } catch (SeException e) {
                 throw new ArcSdeException(e);
@@ -142,10 +142,10 @@ public class TransactionDefaultVersionHandler implements ArcSdeVersionHandler {
             // parent state is closed, create a new one for it
             defaultVersion.getInfo();
             final SeObjectId defaultVersionStateId = defaultVersion.getStateId();
-            final SeState defaultVersionState = connection.createSeState(defaultVersionStateId);
+            final SeState defaultVersionState = session.createSeState(defaultVersionStateId);
             if (!defaultVersionState.isOpen()) {
                 // create a new open state as child of the current version closed state
-                SeState newOpenState = connection.createSeState(null);
+                SeState newOpenState = session.createSeState(null);
                 newOpenState.create(defaultVersionStateId);
                 final SeObjectId newStateId = newOpenState.getId();
                 defaultVersion.changeState(newStateId);

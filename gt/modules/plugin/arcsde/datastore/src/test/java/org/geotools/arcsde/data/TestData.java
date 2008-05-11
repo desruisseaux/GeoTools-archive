@@ -201,12 +201,12 @@ public class TestData {
 
     public String getTemp_table() throws SeException, DataSourceException,
             UnavailableArcSDEConnectionException {
-        Session conn = getConnectionPool().getConnection();
+        Session session = getConnectionPool().getConnection();
         String tempTableName;
         try {
-            tempTableName = getTemp_table(conn.unWrap());
+            tempTableName = getTemp_table(session.unWrap());
         } finally {
-            conn.close();
+            session.close();
         }
         return tempTableName;
     }
@@ -259,22 +259,22 @@ public class TestData {
 
     private static void deleteTable(final ArcSDEConnectionPool connPool, final String tableName)
             throws DataSourceException, UnavailableArcSDEConnectionException {
-        Session conn = connPool.getConnection();
+        Session session = connPool.getConnection();
         try {
             try {
-                SeLayer layer = conn.createSeLayer(tableName, "SHAPE");
+                SeLayer layer = session.createSeLayer(tableName, "SHAPE");
                 layer.delete();
             } catch (SeException e) {
                 // LOGGER.log(Level.WARNING, "while deleteing layer " + tableName + " got '" +
                 // e.getSeError().getErrDesc() + "'");
             }
-            SeTable table = conn.createSeTable(tableName);
+            SeTable table = session.createSeTable(tableName);
             table.delete();
         } catch (SeException e) {
             // LOGGER.log(Level.WARNING, "while deleteing table " + tableName + " got '" +
             // e.getSeError().getErrDesc() + "'");
         } finally {
-            conn.close();
+            session.close();
         }
     }
 
@@ -290,29 +290,29 @@ public class TestData {
 
         deleteTempTable(connPool);
 
-        Session conn = connPool.getConnection();
+        Session session = connPool.getConnection();
 
         try {
             /*
              * Create a qualified table name with current user's name and the name of the table to
              * be created, "EXAMPLE".
              */
-            tempTableLayer = conn.createSeLayer();
-            String tableName = getTemp_table(conn.unWrap());
-            tempTable = conn.createSeTable(tableName);
+            tempTableLayer = session.createSeLayer();
+            String tableName = getTemp_table(session.unWrap());
+            tempTable = session.createSeTable(tableName);
             tempTableLayer.setTableName(tableName);
 
-            tempTableColumns = createBaseTable(conn.unWrap(), tempTable, tempTableLayer,
+            tempTableColumns = createBaseTable(session.unWrap(), tempTable, tempTableLayer,
                     configKeyword);
 
             if (insertTestData) {
-                insertData(tempTableLayer, conn.unWrap(), tempTableColumns);
+                insertData(tempTableLayer, session.unWrap(), tempTableColumns);
             }
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
         } finally {
-            conn.close();
+            session.close();
         }
     }
 
@@ -325,12 +325,12 @@ public class TestData {
      */
     public void insertTestData() throws Exception {
         ArcSDEConnectionPool connPool = getConnectionPool();
-        Session conn = connPool.getConnection();
+        Session session = connPool.getConnection();
         try {
             tempTable.truncate();
-            insertData(tempTableLayer, conn.unWrap(), tempTableColumns);
+            insertData(tempTableLayer, session.unWrap(), tempTableColumns);
         } finally {
-            conn.close();
+            session.close();
         }
     }
 
@@ -783,7 +783,7 @@ public class TestData {
 
     private void createSimpleTestTables() throws IOException, SeException {
         final ArcSDEConnectionPool connectionPool = getConnectionPool();
-        final Session conn = connectionPool.getConnection();
+        final Session session = connectionPool.getConnection();
 
         String tableName;
         String rowIdColName;
@@ -795,57 +795,57 @@ public class TestData {
 
             tableName = "GT_TEST_POINT_ROWID_USER";
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER;
-            createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+            createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
 
             tableName = "GT_TEST_POINT_ROWID_SDE";
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE;
-            createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+            createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
 
             tableName = "GT_TEST_POINT_ROWID_NONE";
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE;
-            createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+            createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
 
             shapeTypeMask = SeLayer.SE_LINE_TYPE_MASK;
 
             tableName = "GT_TEST_LINE_ROWID_USER";
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER;
-            createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+            createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
 
             tableName = "GT_TEST_LINE_ROWID_SDE";
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE;
-            createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+            createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
 
             tableName = "GT_TEST_LINE_ROWID_NONE";
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE;
-            createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+            createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
 
             shapeTypeMask = SeLayer.SE_AREA_TYPE_MASK;
 
             tableName = "GT_TEST_POLYGON_ROWID_USER";
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_USER;
-            createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+            createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
 
             tableName = "GT_TEST_POLYGON_ROWID_SDE";
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE;
-            createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+            createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
 
             tableName = "GT_TEST_POLYGON_ROWID_NONE";
             rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE;
-            createSimpleTestTable(conn, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
+            createSimpleTestTable(session, tableName, rowIdColName, rowIdColumnType, shapeTypeMask);
         } finally {
-            conn.close();
+            session.close();
         }
     }
 
-    private void createSimpleTestTable(final Session conn,
+    private void createSimpleTestTable(final Session session,
             final String tableName,
             final String rowIdColName,
             final int rowIdColumnType,
             final int shapeTypeMask) throws SeException {
         System.out.println("Creating layer " + tableName);
 
-        final SeLayer layer = conn.createSeLayer();
-        final SeTable table = conn.createSeTable(tableName);
+        final SeLayer layer = session.createSeLayer();
+        final SeTable table = session.createSeTable(tableName);
 
         try {
             table.delete();
@@ -882,7 +882,7 @@ public class TestData {
          * Register the column to be used as feature id and managed by sde
          */
         if (SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_NONE != rowIdColumnType) {
-            SeRegistration reg = conn.createSeRegistration(table.getName());
+            SeRegistration reg = session.createSeRegistration(table.getName());
             LOGGER.fine("setting rowIdColumnName to ROW_ID in table " + reg.getTableName());
             reg.setRowIdColumnName("ROW_ID");
             reg.setRowIdColumnType(rowIdColumnType);
@@ -893,7 +893,7 @@ public class TestData {
         if (SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE == rowIdColumnType) {
             // make the table multiversioned
             System.err.println("Making " + tableName + " versioned...");
-            SeRegistration reg = conn.createSeRegistration(tableName);
+            SeRegistration reg = session.createSeRegistration(tableName);
             reg.getInfo();
             reg.setMultiVersion(true);
             reg.alter();
@@ -938,8 +938,8 @@ public class TestData {
      * @return the versioned table created
      * @throws Exception any exception thrown by sde
      */
-    public SeTable createVersionedTable(final Session connection) throws Exception {
-        SeConnection conn = connection.unWrap();
+    public SeTable createVersionedTable(final Session session) throws Exception {
+        SeConnection conn = session.unWrap();
         SeLayer layer = new SeLayer(conn);
         SeTable table;
 
@@ -970,7 +970,7 @@ public class TestData {
         /*
          * Register the column to be used as feature id and managed by sde
          */
-        SeRegistration reg = connection.createSeRegistration(table.getName());
+        SeRegistration reg = session.createSeRegistration(table.getName());
         LOGGER.fine("setting rowIdColumnName to ROW_ID in table " + reg.getTableName());
         reg.setRowIdColumnName("ROW_ID");
         reg.setRowIdColumnType(SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE);
@@ -1003,11 +1003,11 @@ public class TestData {
         return table;
     }
 
-    public void insertIntoVersionedTable(Session conn,
+    public void insertIntoVersionedTable(Session session,
             SeState state,
             String tableName,
             String nameField) throws SeException {
-        SeInsert insert = conn.createSeInsert();
+        SeInsert insert = session.createSeInsert();
 
         SeObjectId differencesId = new SeObjectId(SeState.SE_NULL_STATE_ID);
         insert.setState(state.getId(), differencesId, SeState.SE_STATE_DIFF_NOCHECK);

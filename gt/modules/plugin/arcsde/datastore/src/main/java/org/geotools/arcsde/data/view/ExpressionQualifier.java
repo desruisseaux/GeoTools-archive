@@ -79,37 +79,37 @@ class ExpressionQualifier implements ExpressionVisitor {
     private Expression _qualifiedExpression;
 
     /** DOCUMENT ME! */
-    private Session conn;
+    private Session session;
 
     private Map tableAliases;
 
     /**
      * Creates a new ExpressionQualifier object.
      * 
-     * @param conn
+     * @param session
      *            DOCUMENT ME!
      */
-    private ExpressionQualifier(Session conn, Map tableAliases) {
-        this.conn = conn;
+    private ExpressionQualifier(Session session, Map tableAliases) {
+        this.session = session;
         this.tableAliases = tableAliases;
     }
 
     /**
      * DOCUMENT ME!
      * 
-     * @param conn
+     * @param session
      *            DOCUMENT ME!
      * @param exp
      *            DOCUMENT ME!
      * 
      * @return DOCUMENT ME!
      */
-    public static Expression qualify(Session conn, Map tableAliases, Expression exp) {
+    public static Expression qualify(Session session, Map tableAliases, Expression exp) {
         if (exp == null) {
             return null;
         }
 
-        ExpressionQualifier qualifier = new ExpressionQualifier(conn, tableAliases);
+        ExpressionQualifier qualifier = new ExpressionQualifier(session, tableAliases);
 
         exp.accept(qualifier);
 
@@ -141,7 +141,7 @@ class ExpressionQualifier implements ExpressionVisitor {
         ExpressionList parameters = function.getParameters();
         ExpressionList qualifiedParams;
 
-        qualifiedParams = (ExpressionList) ItemsListQualifier.qualify(conn, tableAliases,
+        qualifiedParams = (ExpressionList) ItemsListQualifier.qualify(session, tableAliases,
                 parameters);
 
         qfunction.setParameters(qualifiedParams);
@@ -159,7 +159,7 @@ class ExpressionQualifier implements ExpressionVisitor {
         InverseExpression qInv = new InverseExpression();
 
         Expression exp = inverseExpression.getExpression();
-        Expression qExp = ExpressionQualifier.qualify(conn, tableAliases, exp);
+        Expression qExp = ExpressionQualifier.qualify(session, tableAliases, exp);
 
         qInv.setExpression(qExp);
         this._qualifiedExpression = qInv;
@@ -234,7 +234,7 @@ class ExpressionQualifier implements ExpressionVisitor {
     public void visit(Parenthesis parenthesis) {
         Expression pExp = parenthesis.getExpression();
         Expression qualifiedExpression;
-        qualifiedExpression = qualify(conn, tableAliases, pExp);
+        qualifiedExpression = qualify(session, tableAliases, pExp);
 
         Parenthesis qualified = new Parenthesis();
         qualified.setExpression(qualifiedExpression);
@@ -253,9 +253,9 @@ class ExpressionQualifier implements ExpressionVisitor {
 
     private void visitBinaryExpression(BinaryExpression exp) {
 
-        Expression left = ExpressionQualifier.qualify(conn, tableAliases, exp.getLeftExpression());
+        Expression left = ExpressionQualifier.qualify(session, tableAliases, exp.getLeftExpression());
         Expression right = ExpressionQualifier
-                .qualify(conn, tableAliases, exp.getRightExpression());
+                .qualify(session, tableAliases, exp.getRightExpression());
 
         BinaryExpression qualified;
 
@@ -337,8 +337,8 @@ class ExpressionQualifier implements ExpressionVisitor {
      *            DOCUMENT ME!
      */
     public void visit(AndExpression andExpression) {
-        Expression left = qualify(conn, tableAliases, andExpression.getLeftExpression());
-        Expression rigth = qualify(conn, tableAliases, andExpression.getRightExpression());
+        Expression left = qualify(session, tableAliases, andExpression.getLeftExpression());
+        Expression rigth = qualify(session, tableAliases, andExpression.getRightExpression());
 
         AndExpression and = new AndExpression(left, rigth);
         this._qualifiedExpression = and;
@@ -351,8 +351,8 @@ class ExpressionQualifier implements ExpressionVisitor {
      *            DOCUMENT ME!
      */
     public void visit(OrExpression orExpression) {
-        Expression left = qualify(conn, tableAliases, orExpression.getLeftExpression());
-        Expression rigth = qualify(conn, tableAliases, orExpression.getRightExpression());
+        Expression left = qualify(session, tableAliases, orExpression.getLeftExpression());
+        Expression rigth = qualify(session, tableAliases, orExpression.getRightExpression());
 
         OrExpression or = new OrExpression(left, rigth);
         this._qualifiedExpression = or;
@@ -367,9 +367,9 @@ class ExpressionQualifier implements ExpressionVisitor {
     public void visit(Between between) {
         Between qualified = new Between();
 
-        Expression start = qualify(conn, tableAliases, between.getBetweenExpressionStart());
-        Expression end = qualify(conn, tableAliases, between.getBetweenExpressionEnd());
-        Expression left = qualify(conn, tableAliases, between.getLeftExpression());
+        Expression start = qualify(session, tableAliases, between.getBetweenExpressionStart());
+        Expression end = qualify(session, tableAliases, between.getBetweenExpressionEnd());
+        Expression left = qualify(session, tableAliases, between.getLeftExpression());
 
         qualified.setBetweenExpressionStart(start);
         qualified.setBetweenExpressionEnd(end);
@@ -414,8 +414,8 @@ class ExpressionQualifier implements ExpressionVisitor {
      *            DOCUMENT ME!
      */
     public void visit(InExpression inExpression) {
-        Expression left = qualify(conn, tableAliases, inExpression.getLeftExpression());
-        ItemsList itemsList = ItemsListQualifier.qualify(conn, tableAliases, inExpression
+        Expression left = qualify(session, tableAliases, inExpression.getLeftExpression());
+        ItemsList itemsList = ItemsListQualifier.qualify(session, tableAliases, inExpression
                 .getItemsList());
 
         InExpression qualified = new InExpression();
@@ -432,7 +432,7 @@ class ExpressionQualifier implements ExpressionVisitor {
      */
     public void visit(IsNullExpression isNullExpression) {
         IsNullExpression qualified = new IsNullExpression();
-        Expression left = qualify(conn, tableAliases, isNullExpression.getLeftExpression());
+        Expression left = qualify(session, tableAliases, isNullExpression.getLeftExpression());
 
         qualified.setLeftExpression(left);
         qualified.setNot(isNullExpression.isNot());
@@ -487,7 +487,7 @@ class ExpressionQualifier implements ExpressionVisitor {
      */
     public void visit(Column tableColumn) {
 
-        Column qualified = ColumnQualifier.qualify(conn, tableAliases, tableColumn);
+        Column qualified = ColumnQualifier.qualify(session, tableAliases, tableColumn);
         this._qualifiedExpression = qualified;
 
     }
@@ -499,7 +499,7 @@ class ExpressionQualifier implements ExpressionVisitor {
      *            DOCUMENT ME!
      */
     public void visit(SubSelect subSelect) {
-        SubSelect qualified = SubSelectQualifier.qualify(conn, subSelect);
+        SubSelect qualified = SubSelectQualifier.qualify(session, subSelect);
         this._qualifiedExpression = qualified;
     }
 
@@ -510,15 +510,15 @@ class ExpressionQualifier implements ExpressionVisitor {
      *            DOCUMENT ME!
      */
     public void visit(CaseExpression caseExpression) {
-        Expression switchExpr = qualify(conn, tableAliases, caseExpression.getSwitchExpression());
-        Expression elseExpr = qualify(conn, tableAliases, caseExpression.getElseExpression());
+        Expression switchExpr = qualify(session, tableAliases, caseExpression.getSwitchExpression());
+        Expression elseExpr = qualify(session, tableAliases, caseExpression.getElseExpression());
 
         List whenClauses = null;
         if (caseExpression.getWhenClauses() != null) {
             whenClauses = new ArrayList();
             for (Iterator it = caseExpression.getWhenClauses().iterator(); it.hasNext();) {
                 WhenClause whenClause = (WhenClause) it.next();
-                WhenClause qWhen = (WhenClause) qualify(conn, tableAliases, whenClause);
+                WhenClause qWhen = (WhenClause) qualify(session, tableAliases, whenClause);
                 whenClauses.add(qWhen);
             }
         }
@@ -537,8 +537,8 @@ class ExpressionQualifier implements ExpressionVisitor {
      *            DOCUMENT ME!
      */
     public void visit(WhenClause whenClause) {
-        Expression whenExpr = qualify(conn, tableAliases, whenClause.getWhenExpression());
-        Expression thenExpr = qualify(conn, tableAliases, whenClause.getThenExpression());
+        Expression whenExpr = qualify(session, tableAliases, whenClause.getWhenExpression());
+        Expression thenExpr = qualify(session, tableAliases, whenClause.getThenExpression());
 
         WhenClause q = new WhenClause();
         q.setWhenExpression(whenExpr);

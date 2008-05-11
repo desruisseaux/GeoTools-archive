@@ -48,7 +48,7 @@ import com.esri.sde.sdk.client.SeConnection;
  */
 class FromItemQualifier implements FromItemVisitor {
     /** DOCUMENT ME! */
-    private Session conn;
+    private Session session;
 
     /** DOCUMENT ME! */
     private FromItem qualifiedFromItem;
@@ -56,32 +56,32 @@ class FromItemQualifier implements FromItemVisitor {
     /**
      * Creates a new FromItemQualifier object.
      * 
-     * @param conn
+     * @param session
      *            DOCUMENT ME!
      * 
      * @throws IllegalStateException
      *             DOCUMENT ME!
      */
-    private FromItemQualifier(Session conn) throws IllegalStateException {
-        this.conn = conn;
+    private FromItemQualifier(Session session) throws IllegalStateException {
+        this.session = session;
     }
 
     /**
      * DOCUMENT ME!
      * 
-     * @param conn
+     * @param session
      *            DOCUMENT ME!
      * @param fromItem
      *            DOCUMENT ME!
      * 
      * @return DOCUMENT ME!
      */
-    public static FromItem qualify(Session conn, FromItem fromItem) {
+    public static FromItem qualify(Session session, FromItem fromItem) {
         if (fromItem == null) {
             return null;
         }
 
-        FromItemQualifier qualifier = new FromItemQualifier(conn);
+        FromItemQualifier qualifier = new FromItemQualifier(session);
         fromItem.accept(qualifier);
 
         return qualifier.qualifiedFromItem;
@@ -94,7 +94,7 @@ class FromItemQualifier implements FromItemVisitor {
      *            DOCUMENT ME!
      */
     public void visit(Table tableName) {
-        qualifiedFromItem = TableQualifier.qualify(conn, tableName);
+        qualifiedFromItem = TableQualifier.qualify(session, tableName);
     }
 
     /**
@@ -104,6 +104,6 @@ class FromItemQualifier implements FromItemVisitor {
      *            DOCUMENT ME!
      */
     public void visit(SubSelect subSelect) {
-        this.qualifiedFromItem = SubSelectQualifier.qualify(conn, subSelect);
+        this.qualifiedFromItem = SubSelectQualifier.qualify(session, subSelect);
     }
 }

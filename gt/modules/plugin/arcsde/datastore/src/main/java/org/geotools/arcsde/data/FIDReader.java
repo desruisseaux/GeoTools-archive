@@ -122,7 +122,7 @@ public abstract class FIDReader {
     /**
      * Returns a FID strategy appropriate for the given SeLayer
      * 
-     * @param conn
+     * @param session
      *            DOCUMENT ME!
      * @param tableName
      *            DOCUMENT ME!
@@ -134,7 +134,7 @@ public abstract class FIDReader {
      * @throws DataSourceException
      *             DOCUMENT ME!
      */
-    public static FIDReader getFidReader(Session conn, SeTable table, SeLayer layer,
+    public static FIDReader getFidReader(Session session, SeTable table, SeLayer layer,
             SeRegistration reg) throws IOException {
         FIDReader fidReader = null;
         final String tableName = reg.getTableName();

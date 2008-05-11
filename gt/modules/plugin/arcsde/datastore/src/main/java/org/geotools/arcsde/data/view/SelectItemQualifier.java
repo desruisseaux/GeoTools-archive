@@ -57,37 +57,37 @@ class SelectItemQualifier implements net.sf.jsqlparser.statement.select.SelectIt
     private List /* <SelectExpressionItem> */qualifiedItems = Collections.EMPTY_LIST;
 
     /** DOCUMENT ME! */
-    private Session conn;
+    private Session session;
 
     private Map tableAliases;
 
     /**
      * Creates a new SelectItemQualifier object.
      * 
-     * @param conn
+     * @param session
      *            DOCUMENT ME!
      */
-    private SelectItemQualifier(Session conn, Map tableAliases) {
-        this.conn = conn;
+    private SelectItemQualifier(Session session, Map tableAliases) {
+        this.session = session;
         this.tableAliases = tableAliases;
     }
 
     /**
      * DOCUMENT ME!
      * 
-     * @param conn
+     * @param session
      *            DOCUMENT ME!
      * @param item
      *            DOCUMENT ME!
      * 
      * @return DOCUMENT ME!
      */
-    public static List qualify(Session conn, Map tableAliases, SelectItem item) {
+    public static List qualify(Session session, Map tableAliases, SelectItem item) {
         if (item == null) {
             return null;
         }
 
-        SelectItemQualifier qualifier = new SelectItemQualifier(conn, tableAliases);
+        SelectItemQualifier qualifier = new SelectItemQualifier(session, tableAliases);
         item.accept(qualifier);
 
         return qualifier.qualifiedItems;
@@ -117,7 +117,7 @@ class SelectItemQualifier implements net.sf.jsqlparser.statement.select.SelectIt
 
         if (unaliasedTable == null) {
             // not an aliased table, qualify it
-            qt = TableQualifier.qualify(conn, allTableColumns.getTable());
+            qt = TableQualifier.qualify(session, allTableColumns.getTable());
         } else {
             // AllTableColumns is refering to an aliased table in the FROM
             // clause,
@@ -131,7 +131,7 @@ class SelectItemQualifier implements net.sf.jsqlparser.statement.select.SelectIt
         SeTable table;
         SeColumnDefinition[] cols;
         try {
-            table = conn.createSeTable(tableName);
+            table = session.createSeTable(tableName);
             cols = table.describe();
         } catch (SeException e) {
             throw new RuntimeException(e.getMessage());
@@ -167,7 +167,7 @@ class SelectItemQualifier implements net.sf.jsqlparser.statement.select.SelectIt
 
         Expression selectExpression = selectExpressionItem.getExpression();
 
-        Expression qualifiedExpression = ExpressionQualifier.qualify(conn, tableAliases,
+        Expression qualifiedExpression = ExpressionQualifier.qualify(session, tableAliases,
                 selectExpression);
 
         qualifiedItem.setExpression(qualifiedExpression);

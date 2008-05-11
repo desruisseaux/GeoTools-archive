@@ -98,7 +98,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
         ArcSDEConnectionConfig connectionConfig = new ArcSDEConnectionConfig(conProps);
         pool = ArcSDEConnectionPoolFactory.getInstance().createPool(connectionConfig);
 
-        Session scon = null;
+        Session session = null;
         SeQuery q = null;
         ArcSDEPyramid pyramid;
         SeRow r;
@@ -107,9 +107,9 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
         try {
 
             // Set up a pyramid and readerprops for the four-band 2005 imagery
-            scon = pool.getConnection();
+            session = pool.getConnection();
             tableName = conProps.getProperty("fourbandtable");
-            q = scon.createSeQuery(new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+            q = session.createSeQuery(new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
             r = q.fetch();
@@ -126,16 +126,16 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
         } finally {
             if (q != null)
                 q.close();
-            if (scon != null) {
-                scon.close();
+            if (session != null) {
+                session.close();
             }
         }
 
         try {
             // Set up a pyramid and readerprops for the three-band 2001 imagery
-            scon = pool.getConnection();
+            session = pool.getConnection();
             conProps.getProperty("threebandtable");
-            q = scon.createSeQuery(new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+            q = session.createSeQuery(new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
             r = q.fetch();
@@ -152,8 +152,8 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
         } finally {
             if (q != null)
                 q.close();
-            if (scon != null) {
-                scon.close();
+            if (session != null) {
+                session.close();
             }
         }
     }
@@ -179,9 +179,9 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(fourBandReaderProps);
 
-        Session scon = null;
+        Session session = null;
         try {
-            scon = pool.getConnection();
+            session = pool.getConnection();
 
             SeRasterBand[] bands = rasterAttr.getBands();
             HashMap bandMapper = new HashMap();
@@ -196,7 +196,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
 
             ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
             rParam.setSourceBands(new int[] { 1, 2, 3 });
-            rParam.setConnection(scon);
+            rParam.setConnection(session);
             rParam.setSourceRegion(new Rectangle(0, 0, 1000, 1000));
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_RGB);
             rParam.setDestination(image);
@@ -224,8 +224,8 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image,
                     imgPrefix + "3.png"));
         } finally {
-            if (scon != null && !scon.isClosed())
-                scon.close();
+            if (session != null && !session.isClosed())
+                session.close();
         }
     }
 
@@ -242,9 +242,9 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(fourBandReaderProps);
 
-        Session scon = null;
+        Session session = null;
         try {
-            scon = pool.getConnection();
+            session = pool.getConnection();
 
             SeRasterBand[] bands = rasterAttr.getBands();
             HashMap bandMapper = new HashMap();
@@ -259,7 +259,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
 
             ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
             rParam.setSourceBands(new int[] { 1, 2, 3 });
-            rParam.setConnection(scon);
+            rParam.setConnection(session);
             rParam.setSourceRegion(new Rectangle(0, 0, 1000, 1000));
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_INT_ARGB);
             int[] opaque = new int[image.getWidth() * image.getHeight()];
@@ -305,8 +305,8 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image,
                     imgPrefix + "3.png"));
         } finally {
-            if (scon != null)
-                scon.close();
+            if (session != null)
+                session.close();
         }
     }
 
@@ -324,9 +324,9 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(fourBandReaderProps);
 
-        Session scon = null;
+        Session session = null;
         try {
-            scon = pool.getConnection();
+            session = pool.getConnection();
             SeRasterBand[] bands = rasterAttr.getBands();
             HashMap bandMapper = new HashMap();
             bandMapper.put(Integer.valueOf((int) bands[0].getId().longValue()), Integer.valueOf(0));
@@ -337,7 +337,7 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
 
             ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
             rParam.setSourceBands(new int[] { 1, 2, 3 });
-            rParam.setConnection(scon);
+            rParam.setConnection(session);
             rParam.setSourceRegion(new Rectangle(0, 0, 1000, 1000));
             image = new BufferedImage(1000, 1000, BufferedImage.TYPE_4BYTE_ABGR);
             int[] opaque = new int[image.getWidth() * image.getHeight()];
@@ -354,8 +354,8 @@ public class ArcSDEImageIOReaderOutputFormatsTest extends TestCase {
             assertTrue("Image from SDE isn't what we expected.", RasterTestData.imageEquals(image,
                     imgPrefix + "1.png"));
         } finally {
-            if (scon != null && !scon.isClosed())
-                scon.close();
+            if (session != null && !session.isClosed())
+                session.close();
         }
     }
 }

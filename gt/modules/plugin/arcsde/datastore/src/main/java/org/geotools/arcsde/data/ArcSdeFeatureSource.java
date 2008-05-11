@@ -137,13 +137,13 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
      */
     public final ReferencedEnvelope getBounds(final Query query) throws IOException {
         final Query namedQuery = namedQuery(query);
-        final Session connection = getConnection();
+        final Session session = getConnection();
         ReferencedEnvelope ev;
         try {
-            ev = getBounds(namedQuery, connection);
+            ev = getBounds(namedQuery, session);
         } finally {
-            if (!connection.isTransactionActive()) {
-                connection.close();
+            if (!session.isTransactionActive()) {
+                session.close();
             }
         }
         return ev;
@@ -151,16 +151,16 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
 
     /**
      * @param namedQuery
-     * @param connection
+     * @param session
      * @return The bounding box of the query or null if unknown and too expensive for the method to
      *         calculate or any errors occur.
      * @throws DataSourceException
      * @throws IOException
      */
     protected ReferencedEnvelope getBounds(final Query namedQuery,
-            final Session connection) throws DataSourceException, IOException {
+            final Session session) throws DataSourceException, IOException {
         Envelope ev;
-        ev = ArcSDEQuery.calculateQueryExtent(connection, typeInfo, namedQuery, versionHandler);
+        ev = ArcSDEQuery.calculateQueryExtent(session, typeInfo, namedQuery, versionHandler);
 
         if (ev != null) {
             if (LOGGER.isLoggable(Level.FINER)) {
@@ -186,13 +186,13 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
      */
     public final int getCount(final Query query) throws IOException {
         final Query namedQuery = namedQuery(query);
-        final Session connection = getConnection();
+        final Session session = getConnection();
         final int count;
         try {
-            count = getCount(namedQuery, connection);
+            count = getCount(namedQuery, session);
         } finally {
-            if (!connection.isTransactionActive()) {
-                connection.close();
+            if (!session.isTransactionActive()) {
+                session.close();
             }
         }
         return count;
@@ -201,10 +201,10 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
     /**
      * @see FeatureSource#getCount(Query)
      */
-    protected int getCount(final Query namedQuery, final Session connection)
+    protected int getCount(final Query namedQuery, final Session session)
             throws IOException {
         final int count;
-        count = ArcSDEQuery.calculateResultCount(connection, typeInfo, namedQuery, versionHandler);
+        count = ArcSDEQuery.calculateResultCount(session, typeInfo, namedQuery, versionHandler);
         return count;
     }
 
@@ -221,8 +221,8 @@ public class ArcSdeFeatureSource implements FeatureSource<SimpleFeatureType, Sim
      */
     protected Session getConnection() throws IOException {
         final ArcSDEConnectionPool connectionPool = dataStore.getConnectionPool();
-        final Session connection = connectionPool.getConnection();
-        return connection;
+        final Session session = connectionPool.getConnection();
+        return session;
     }
 
     private Query namedQuery(final Query query) {

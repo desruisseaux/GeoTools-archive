@@ -79,16 +79,16 @@ public class ArcSDEConnectionReference extends ArcSDEConnectionPool {
             // stackTrace[3].getMethodName();
             // }
 
-            Session connection = (Session) this.pool.borrowObject();
+            Session session = (Session) this.pool.borrowObject();
 
             if (LOGGER.isLoggable(Level.FINER)) {
                 // System.err.println("-> " + caller + " got " + connection);
-                LOGGER.finer(connection + " out of connection pool");
+                LOGGER.finer(session + " out of connection pool");
             }
 
-            connection.markActive();
+            session.markActive();
             // TODO: Push the transaction into the connection to make the connection modal
-            return connection;
+            return session;
         } catch (NoSuchElementException e) {
             LOGGER.log(Level.WARNING, "Out of connections: " + e.getMessage(), e);
             throw new UnavailableArcSDEConnectionException(this.pool.getNumActive(), this.config);
@@ -147,9 +147,9 @@ public class ArcSDEConnectionReference extends ArcSDEConnectionPool {
             NegativeArraySizeException cause = null;
             for (int i = 0; i < 3; i++) {
                 try {
-                    Session seConn = new Session(
+                    Session session = new Session(
                             ArcSDEConnectionReference.this.pool, config);
-                    return seConn;
+                    return session;
                 } catch (NegativeArraySizeException nase) {
                     LOGGER.warning("Strange failed ArcSDE connection error.  Trying again (try "
                             + (i + 1) + " of 3)");

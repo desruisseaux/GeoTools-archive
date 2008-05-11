@@ -200,17 +200,17 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         }
 
         ArcSDEConnectionPool connectionPool = testData.getConnectionPool();
-        Session connection = connectionPool.getConnection();
+        Session session = connectionPool.getConnection();
         SeQuery seQuery;
         try {
             int objectId = (int) ArcSDEAdapter.getNumericFid(fid);
             String whereClause = "ROW_ID=" + objectId;
-            seQuery = connection.createSeQuery(new String[] { "ROW_ID", "INT32_COL", "STRING_COL" },
+            seQuery = session.createSeQuery(new String[] { "ROW_ID", "INT32_COL", "STRING_COL" },
                     new SeSqlConstruct(typeName, whereClause));
             seQuery.prepareQuery();
             seQuery.execute();
         } finally {
-            connection.close();
+            session.close();
         }
         SeRow row = seQuery.fetch();
         assertNull(row);
@@ -291,10 +291,10 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         final String typeName;
         {
             ArcSDEConnectionPool connectionPool = testData.getConnectionPool();
-            Session connection = connectionPool.getConnection();
+            Session session = connectionPool.getConnection();
             final String user;
-            user = connection.getUser();
-            connection.close();
+            user = session.getUser();
+            session.close();
             typeName = user + ".GT_TEST_CREATE";
         }
 
@@ -1300,12 +1300,12 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         try {
             final String tableName;
             {
-                Session conn = testData.getConnectionPool().getConnection();
+                Session session = testData.getConnectionPool().getConnection();
                 try {
-                    SeTable versionedTable = testData.createVersionedTable(conn);
+                    SeTable versionedTable = testData.createVersionedTable(session);
                     tableName = versionedTable.getQualifiedName();
                 } finally {
-                    conn.close();
+                    session.close();
                 }
             }
 
@@ -1398,12 +1398,12 @@ public class ArcSDEFeatureStoreTest extends TestCase {
         try {
             final String tableName;
             {
-                Session conn = testData.getConnectionPool().getConnection();
+                Session session = testData.getConnectionPool().getConnection();
                 try {
-                    SeTable versionedTable = testData.createVersionedTable(conn);
+                    SeTable versionedTable = testData.createVersionedTable(session);
                     tableName = versionedTable.getQualifiedName();
                 } finally {
-                    conn.close();
+                    session.close();
                 }
             }
 

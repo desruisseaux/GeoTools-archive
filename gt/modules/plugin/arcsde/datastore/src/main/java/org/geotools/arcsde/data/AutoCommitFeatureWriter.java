@@ -41,12 +41,12 @@ class AutoCommitFeatureWriter extends ArcSdeFeatureWriter {
     public AutoCommitFeatureWriter(final FIDReader fidReader,
                                    final SimpleFeatureType featureType,
                                    final FeatureReader<SimpleFeatureType, SimpleFeature> filteredContent,
-                                   final Session connection,
+                                   final Session session,
                                    final FeatureListenerManager listenerManager,
                                    final ArcSdeVersionHandler versionHandler) throws NoSuchElementException,
                                                                              IOException {
 
-        super(fidReader, featureType, filteredContent, connection, listenerManager, versionHandler);
+        super(fidReader, featureType, filteredContent, session, listenerManager, versionHandler);
     }
 
     

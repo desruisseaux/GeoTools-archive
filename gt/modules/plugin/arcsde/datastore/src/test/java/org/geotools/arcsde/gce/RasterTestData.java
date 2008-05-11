@@ -135,14 +135,14 @@ public class RasterTestData {
      */
     public void load1bitRaster() throws Exception {
         // we're definitely piggybacking on the testData class here
-        Session conn = testData.getConnectionPool().getConnection();
+        Session session = testData.getConnectionPool().getConnection();
         final String tableName = get1bitRasterTableName();
 
         // clean out the table if it's currently in-place
         testData.deleteTable(tableName);
         // build the base business table. We'll add the raster data to it in a bit
-        createRasterBusinessTempTable(tableName, conn);
-        conn.close();
+        createRasterBusinessTempTable(tableName, session);
+        session.close();
 
         SeExtent imgExtent = new SeExtent(231000, 898000, 231000 + 500, 898000 + 500);
         SeCoordinateReference crs = getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
@@ -161,14 +161,14 @@ public class RasterTestData {
      */
     public void loadRGBRaster() throws Exception {
         // we're definitely piggybacking on the testData class here
-        Session conn = testData.getConnectionPool().getConnection();
+        Session session = testData.getConnectionPool().getConnection();
         final String tableName = getRGBRasterTableName();
 
         // clean out the table if it's currently in-place
         testData.deleteTable(tableName);
         // build the base business table. We'll add the raster data to it in a bit
-        createRasterBusinessTempTable(tableName, conn);
-        conn.close();
+        createRasterBusinessTempTable(tableName, session);
+        session.close();
 
         SeExtent imgExtent = new SeExtent(231000, 898000, 231000 + 501, 898000 + 501);
         SeCoordinateReference crs = getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
@@ -181,14 +181,14 @@ public class RasterTestData {
 
     public void loadRGBColorMappedRaster() throws Exception {
         // Note that this DOESN'T LOAD THE COLORMAP RIGHT NOW.
-        Session conn = testData.getConnectionPool().getConnection();
+        Session session = testData.getConnectionPool().getConnection();
         final String tableName = getRGBColorMappedRasterTableName();
 
         // clean out the table if it's currently in-place
         testData.deleteTable(tableName);
         // build the base business table. We'll add the raster data to it in a bit
-        createRasterBusinessTempTable(tableName, conn);
-        conn.close();
+        createRasterBusinessTempTable(tableName, session);
+        session.close();
 
         SeExtent imgExtent = new SeExtent(231000, 898000, 231000 + 500, 898000 + 500);
         SeCoordinateReference crs = getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
@@ -201,14 +201,14 @@ public class RasterTestData {
 
     public void loadOneByteGrayScaleRaster() throws Exception {
         // Note that this DOESN'T LOAD THE COLORMAP RIGHT NOW.
-        Session conn = testData.getConnectionPool().getConnection();
+        Session session = testData.getConnectionPool().getConnection();
         final String tableName = getGrayScaleOneByteRasterTableName();
 
         // clean out the table if it's currently in-place
         testData.deleteTable(tableName);
         // build the base business table. We'll add the raster data to it in a bit
-        createRasterBusinessTempTable(tableName, conn);
-        conn.close();
+        createRasterBusinessTempTable(tableName, session);
+        session.close();
 
         SeExtent imgExtent = new SeExtent(231000, 898000, 231000 + 500, 898000 + 500);
         SeCoordinateReference crs = getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
@@ -221,14 +221,14 @@ public class RasterTestData {
 
     public void loadFloatRaster() throws Exception {
         // Note that this DOESN'T LOAD THE COLORMAP RIGHT NOW.
-        Session conn = testData.getConnectionPool().getConnection();
+        Session session = testData.getConnectionPool().getConnection();
         final String tableName = getFloatRasterTableName();
 
         // clean out the table if it's currently in-place
         testData.deleteTable(tableName);
         // build the base business table. We'll add the raster data to it in a bit
-        createRasterBusinessTempTable(tableName, conn);
-        conn.close();
+        createRasterBusinessTempTable(tableName, session);
+        session.close();
 
         SeExtent imgExtent = new SeExtent(245900, 899600, 246300, 900000);
         SeCoordinateReference crs = getSeCRSFromPeProjectedCSId(PePCSDefs.PE_PCS_NAD_1983_HARN_MA_M);
@@ -251,28 +251,28 @@ public class RasterTestData {
         return crs;
     }
 
-    public void createRasterBusinessTempTable(String tableName, Session conn) throws Exception {
+    public void createRasterBusinessTempTable(String tableName, Session session) throws Exception {
 
         SeColumnDefinition[] colDefs = new SeColumnDefinition[1];
-        SeTable table = conn.createSeTable(tableName);
+        SeTable table = session.createSeTable(tableName);
 
         // first column to be SDE managed feature id
         colDefs[0] = new SeColumnDefinition("ROW_ID", SeColumnDefinition.TYPE_INTEGER, 10, 0, false);
-        conn.getLock().lock();
+        session.getLock().lock();
         table.create(colDefs, testData.getConfigKeyword());
-        conn.getLock().unlock();
+        session.getLock().unlock();
 
         /*
          * Register the column to be used as feature id and managed by sde
          */
-        SeRegistration reg = conn.createSeRegistration(table.getName());
+        SeRegistration reg = session.createSeRegistration(table.getName());
         LOGGER.fine("setting rowIdColumnName to ROW_ID in table " + reg.getTableName());
         reg.setRowIdColumnName("ROW_ID");
         final int rowIdColumnType = SeRegistration.SE_REGISTRATION_ROW_ID_COLUMN_TYPE_SDE;
         reg.setRowIdColumnType(rowIdColumnType);
-        conn.getLock().lock();
+        session.getLock().lock();
         reg.alter();
-        conn.getLock().unlock();
+        session.getLock().unlock();
     }
 
     public void importRasterImage(final String tableName,
@@ -291,21 +291,21 @@ public class RasterTestData {
             SeExtent extent,
             ArcSDERasterProducer prod,
             IndexColorModel colorModel) throws Exception {
-        Session conn = testData.getConnectionPool().getConnection();
+        Session session = testData.getConnectionPool().getConnection();
         try {
 
             // much of this code is from
             // http://edndoc.esri.com/arcsde/9.2/concepts/rasters/dataloading/dataloading.htm
-            SeRasterColumn rasCol = conn.createSeRasterColumn();
+            SeRasterColumn rasCol = session.createSeRasterColumn();
             rasCol.setTableName(tableName);
             rasCol.setDescription("Sample geotools ArcSDE raster test-suite data.");
             rasCol.setRasterColumnName("RASTER");
             rasCol.setCoordRef(crs);
             rasCol.setConfigurationKeyword(testData.getConfigKeyword());
 
-            conn.getLock().lock();
+            session.getLock().lock();
             rasCol.create();
-            conn.getLock().unlock();
+            session.getLock().unlock();
 
             // now start loading the actual raster data
             BufferedImage sampleImage = ImageIO.read(org.geotools.test.TestData.getResource(null,
@@ -331,17 +331,17 @@ public class RasterTestData {
             attr.setRasterProducer(prod);
 
             try {
-                SeInsert insert = conn.createSeInsert();
+                SeInsert insert = session.createSeInsert();
                 insert.intoTable(tableName, new String[] { "RASTER" });
                 // no buffered writes on raster loads
                 insert.setWriteMode(false);
                 SeRow row = insert.getRowToSet();
                 row.setRaster(0, attr);
 
-                conn.getLock().lock();
+                session.getLock().lock();
                 insert.execute();
                 insert.close();
-                conn.getLock().unlock();
+                session.getLock().unlock();
             } catch (SeException se) {
                 se.printStackTrace();
                 throw se;
@@ -355,7 +355,7 @@ public class RasterTestData {
             }
 
         } finally {
-            conn.close();
+            session.close();
         }
     }
 
@@ -442,16 +442,16 @@ public class RasterTestData {
             int level,
             int[] bands) throws DataSourceException, UnavailableArcSDEConnectionException {
 
-        Session conn = testData.getConnectionPool().getConnection();
+        Session session = testData.getConnectionPool().getConnection();
 
         try {
-            SeQuery query = conn.createSeQuery(new String[] { conn.getRasterColumn(rasterName)
+            SeQuery query = session.createSeQuery(new String[] { session.getRasterColumn(rasterName)
                     .getName() }, new SeSqlConstruct(rasterName));
-            conn.getLock().lock();
+            session.getLock().lock();
             query.prepareQuery();
             query.execute();
             final SeRow r = query.fetch();
-            conn.getLock().unlock();
+            session.getLock().unlock();
 
             // Now build a SeRasterConstraint object which queries the db for
             // the right tiles/bands/pyramid level
@@ -463,19 +463,19 @@ public class RasterTestData {
 
             // Finally, execute the raster query aganist the already-opened
             // SeQuery object which already has an SeRow fetched against it.
-            conn.getLock().lock();
+            session.getLock().lock();
 
             query.queryRasterTile(rConstraint);
             final SeRasterAttr rattr = r.getRaster(0);
 
             query.close();
-            conn.getLock().unlock();
+            session.getLock().unlock();
 
             return rattr;
         } catch (SeException se) {
             throw new DataSourceException(se);
         } finally {
-            conn.close();
+            session.close();
         }
     }
 }

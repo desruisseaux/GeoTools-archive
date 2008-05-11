@@ -68,7 +68,7 @@ import com.esri.sde.sdk.client.SeConnection;
  */
 public class SelectQualifier implements net.sf.jsqlparser.statement.select.SelectVisitor {
     /** DOCUMENT ME! */
-    private Session conn;
+    private Session session;
 
     /** DOCUMENT ME! */
     private PlainSelect qualifiedSelect;
@@ -76,11 +76,11 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
     /**
      * Creates a new SelectQualifier object.
      * 
-     * @param conn
+     * @param session
      *            DOCUMENT ME!
      */
-    public SelectQualifier(Session conn) {
-        this.conn = conn;
+    public SelectQualifier(Session session) {
+        this.session = session;
     }
 
     public static PlainSelect qualify(Session conn, PlainSelect select) {
@@ -178,7 +178,7 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
             return null;
         }
 
-        Expression qualifiedWhere = ExpressionQualifier.qualify(conn, tableAliases, where);
+        Expression qualifiedWhere = ExpressionQualifier.qualify(session, tableAliases, where);
 
         return qualifiedWhere;
     }
@@ -201,7 +201,7 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
         for (Iterator it = orderByElements.iterator(); it.hasNext();) {
             OrderByElement orderByElem = (OrderByElement) it.next();
 
-            OrderByElement qualified = OrderByElementQualifier.qualify(conn, tableAliases,
+            OrderByElement qualified = OrderByElementQualifier.qualify(session, tableAliases,
                     orderByElem);
 
             qualifiedOrderElems.add(qualified);
@@ -228,7 +228,7 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
         for (Iterator it = selectItems.iterator(); it.hasNext();) {
             SelectItem selectItem = (SelectItem) it.next();
 
-            List items = SelectItemQualifier.qualify(conn, tableAlias, selectItem);
+            List items = SelectItemQualifier.qualify(session, tableAlias, selectItem);
 
             qualifiedItems.addAll(items);
         }
@@ -254,7 +254,7 @@ public class SelectQualifier implements net.sf.jsqlparser.statement.select.Selec
         for (Iterator it = fromItems.iterator(); it.hasNext();) {
             FromItem fromItem = (FromItem) it.next();
 
-            FromItem qualifiedItem = FromItemQualifier.qualify(conn, fromItem);
+            FromItem qualifiedItem = FromItemQualifier.qualify(session, fromItem);
 
             qualifiedFromItems.add(qualifiedItem);
         }

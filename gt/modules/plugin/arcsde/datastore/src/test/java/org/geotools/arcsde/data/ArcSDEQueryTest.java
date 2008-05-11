@@ -178,16 +178,16 @@ public class ArcSDEQueryTest extends TestCase {
     }
 
     private ArcSDEQuery getQueryAll() throws IOException {
-        Session connection = dstore.getConnectionPool().getConnection();
-        this._queryAll = ArcSDEQuery.createQuery(connection, ftype, Query.ALL,
+        Session session = dstore.getConnectionPool().getConnection();
+        this._queryAll = ArcSDEQuery.createQuery(session, ftype, Query.ALL,
                 FIDReader.NULL_READER, ArcSdeVersionHandler.NONVERSIONED_HANDLER);
         return this._queryAll;
     }
 
     private ArcSDEQuery getQueryFiltered() throws IOException {
-        Session connection = dstore.getConnectionPool().getConnection();
-        FeatureTypeInfo fti = ArcSDEAdapter.fetchSchema(typeName, null, connection);
-        this.queryFiltered = ArcSDEQuery.createQuery(connection, ftype, filteringQuery, fti
+        Session session = dstore.getConnectionPool().getConnection();
+        FeatureTypeInfo fti = ArcSDEAdapter.fetchSchema(typeName, null, session);
+        this.queryFiltered = ArcSDEQuery.createQuery(session, ftype, filteringQuery, fti
                 .getFidStrategy(), new AutoCommitDefaultVersionHandler());
         return this.queryFiltered;
     }
@@ -197,22 +197,22 @@ public class ArcSDEQueryTest extends TestCase {
      */
     public void testClose() throws IOException {
         ArcSDEQuery queryAll = getQueryAll();
-        assertNotNull(queryAll.connection);
+        assertNotNull(queryAll.session);
 
         queryAll.execute();
 
-        assertNotNull(queryAll.connection);
+        assertNotNull(queryAll.session);
 
         // should nevel do this, just to assert it is
         // not closed by returned to the pool
-        Session conn = queryAll.connection;
+        Session session = queryAll.session;
 
         queryAll.close();
 
-        assertNotNull(queryAll.connection);
-        assertFalse(conn.isClosed());
+        assertNotNull(queryAll.session);
+        assertFalse(session.isClosed());
 
-        conn.close();
+        session.close();
     }
 
     /**
@@ -238,7 +238,7 @@ public class ArcSDEQueryTest extends TestCase {
             // ok
         }
 
-        queryAll.connection.close();
+        queryAll.session.close();
     }
 
     /**
@@ -257,12 +257,12 @@ public class ArcSDEQueryTest extends TestCase {
 
         ArcSDEQuery q = getQueryAll();
         int calculated = q.calculateResultCount();
-        q.connection.close();
+        q.session.close();
         assertEquals(read, calculated);
 
         q = getQueryFiltered();
         calculated = q.calculateResultCount();
-        q.connection.close();
+        q.session.close();
         assertEquals(FILTERING_COUNT, calculated);
     }
 

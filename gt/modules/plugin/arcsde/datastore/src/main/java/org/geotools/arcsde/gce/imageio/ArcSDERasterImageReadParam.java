@@ -66,7 +66,7 @@ import com.esri.sde.sdk.client.SeRasterBand;
  */
 public class ArcSDERasterImageReadParam extends ImageReadParam {
 
-    protected Session connection;
+    protected Session session;
 
     protected HashMap<Integer, Integer> bandMapper;
 
@@ -79,10 +79,10 @@ public class ArcSDERasterImageReadParam extends ImageReadParam {
     }
 
     public Session getConnection() {
-        return connection;
+        return session;
     }
 
-    public void setConnection(Session connection) {
-        this.connection = connection;
+    public void setConnection(Session session) {
+        this.session = session;
     }
 }

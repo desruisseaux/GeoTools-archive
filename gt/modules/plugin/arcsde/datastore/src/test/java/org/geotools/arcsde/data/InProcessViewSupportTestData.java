@@ -71,7 +71,7 @@ public class InProcessViewSupportTestData {
 
     public static final String typeName = "MasterChildTest";
 
-    public static void setUp(Session conn, TestData td) throws SeException, DataSourceException,
+    public static void setUp(Session session, TestData td) throws SeException, DataSourceException,
             UnavailableArcSDEConnectionException {
 
         testCrs = DefaultGeographicCRS.WGS84;
@@ -85,19 +85,19 @@ public class InProcessViewSupportTestData {
                 + ".MASTER_ID = " + MASTER_UNQUALIFIED + ".ID ORDER BY " + MASTER_UNQUALIFIED
                 + ".ID";
 
-        MASTER = conn.getUser() + "." + MASTER_UNQUALIFIED;
-        CHILD = conn.getUser() + "." + CHILD_UNQUALIFIED;
-        createMasterTable(conn, td);
-        createChildTable(conn, td);
+        MASTER = session.getUser() + "." + MASTER_UNQUALIFIED;
+        CHILD = session.getUser() + "." + CHILD_UNQUALIFIED;
+        createMasterTable(session, td);
+        createChildTable(session, td);
 
         registerViewParams = new HashMap();
         registerViewParams.put("sqlView.1.typeName", typeName);
         registerViewParams.put("sqlView.1.sqlQuery", masterChildSql);
     }
 
-    private static void createMasterTable(Session conn, TestData td) throws SeException,
+    private static void createMasterTable(Session session, TestData td) throws SeException,
             DataSourceException, UnavailableArcSDEConnectionException {
-        SeTable table = conn.createSeTable( MASTER);
+        SeTable table = session.createSeTable( MASTER);
         SeLayer layer = null;
         try {
             table.delete();
@@ -107,7 +107,7 @@ public class InProcessViewSupportTestData {
 
         SeColumnDefinition[] colDefs = new SeColumnDefinition[2];
 
-        layer = conn.createSeLayer();
+        layer = session.createSeLayer();
         layer.setTableName(MASTER);
 
         colDefs[0] = new SeColumnDefinition("ID", SeColumnDefinition.TYPE_INT32, 10, 0, false);
@@ -125,13 +125,13 @@ public class InProcessViewSupportTestData {
         layer.setCreationKeyword(td.getConfigKeyword());
         layer.create(3, 4);
 
-        insertMasterData(conn, layer);
+        insertMasterData(session, layer);
         LOGGER.info("successfully created master table " + layer.getQualifiedName());
     }
 
-    private static void createChildTable(Session conn, TestData td) throws DataSourceException,
+    private static void createChildTable(Session session, TestData td) throws DataSourceException,
             UnavailableArcSDEConnectionException, SeException {
-        SeTable table = conn.createSeTable(CHILD);
+        SeTable table = session.createSeTable(CHILD);
         try {
             table.delete();
         } catch (SeException e) {
@@ -155,7 +155,7 @@ public class InProcessViewSupportTestData {
          * tableRegistration.setRowIdColumnName("ID");
          * tableRegistration.alter();
          */
-        insertChildData(conn, table);
+        insertChildData(session, table);
 
         LOGGER.info("successfully created child table " + CHILD);
     }
@@ -177,11 +177,11 @@ public class InProcessViewSupportTestData {
      * </code>
      * </pre>
      * 
-     * @param conn
+     * @param session
      * @throws SeException
      * @throws Exception
      */
-    private static void insertMasterData(Session conn, SeLayer layer)
+    private static void insertMasterData(Session session, SeLayer layer)
             throws SeException {
         SeInsert insert = null;
 
@@ -189,7 +189,7 @@ public class InProcessViewSupportTestData {
         final String[] columns = { "ID", "NAME", "SHAPE" };
 
         for (int i = 1; i < 4; i++) {
-            insert = conn.createSeInsert();
+            insert = session.createSeInsert();
             insert.intoTable(layer.getName(), columns);
             insert.setWriteMode(true);
 
@@ -203,7 +203,7 @@ public class InProcessViewSupportTestData {
             row.setShape(2, shape);
             insert.execute();
         }
-        conn.commitTransaction();
+        session.commitTransaction();
     }
 
     /**
@@ -233,12 +233,12 @@ public class InProcessViewSupportTestData {
      * 
      * Note last row has the same name than child6, for testing group by.
      * 
-     * @param conn
+     * @param session
      * @param table
      * @throws SeException
      * @throws Exception
      */
-    private static void insertChildData(Session conn, SeTable table)
+    private static void insertChildData(Session session, SeTable table)
             throws SeException {
         final String[] columns = { "ID", "MASTER_ID", "NAME", "DESCRIPTION" };
 
@@ -248,7 +248,7 @@ public class InProcessViewSupportTestData {
             for (int child = 0; child < master; child++) {
                 childId++;
 
-                SeInsert insert = conn.createSeInsert();
+                SeInsert insert = session.createSeInsert();
                 insert.intoTable(table.getName(), columns);
                 insert.setWriteMode(true);
 
@@ -263,7 +263,7 @@ public class InProcessViewSupportTestData {
             }
         }
         // add the 7th row to test group by
-        SeInsert insert = conn.createSeInsert();
+        SeInsert insert = session.createSeInsert();
         insert.intoTable(table.getName(), columns);
         insert.setWriteMode(true);
         SeRow row = insert.getRowToSet();
@@ -274,6 +274,6 @@ public class InProcessViewSupportTestData {
         row.setString(3, "description7");
         insert.execute();
         //insert.close();
-        conn.commitTransaction();
+        session.commitTransaction();
     }
 }

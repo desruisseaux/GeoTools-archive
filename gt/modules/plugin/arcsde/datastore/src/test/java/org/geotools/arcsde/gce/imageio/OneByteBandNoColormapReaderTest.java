@@ -33,7 +33,7 @@ public class OneByteBandNoColormapReaderTest {
         rasterTestData.setUp();
         rasterTestData.loadOneByteGrayScaleRaster();
         
-        Session scon = null;
+        Session session = null;
         SeQuery q = null;
         ArcSDEPyramid pyramid;
         SeRow r;
@@ -41,16 +41,16 @@ public class OneByteBandNoColormapReaderTest {
         try {
 
             // Set up a pyramid and readerprops for the sample three-band imagery
-            scon = rasterTestData.getTestData().getConnectionPool().getConnection();
+            session = rasterTestData.getTestData().getConnectionPool().getConnection();
             tableName = rasterTestData.getGrayScaleOneByteRasterTableName();
-            q = new SeQuery(scon.unWrap(), new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+            q = new SeQuery(session.unWrap(), new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
             r = q.fetch();
             SeRasterAttr rattrThreeBand = r.getRaster(0);
             q.close();
 
-            SeRasterColumn rcol = new SeRasterColumn(scon.unWrap(), rattrThreeBand.getRasterColumnId());
+            SeRasterColumn rcol = new SeRasterColumn(session.unWrap(), rattrThreeBand.getRasterColumnId());
 
             CoordinateReferenceSystem crs = CRS.parseWKT(rcol.getCoordRef().getCoordSysDescription());
             pyramid = new ArcSDEPyramid(rattrThreeBand, crs);
@@ -65,8 +65,8 @@ public class OneByteBandNoColormapReaderTest {
         } finally {
             if (q != null)
                 q.close();
-            if (scon != null) {
-                scon.close();
+            if (session != null) {
+                session.close();
             }
         }
     }

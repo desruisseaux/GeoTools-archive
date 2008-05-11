@@ -44,16 +44,16 @@ public class AutoCommitDefaultVersionHandler implements ArcSdeVersionHandler {
         //
     }
 
-    public void setUpStream(final Session connection, SeStreamOp streamOperation)
+    public void setUpStream(final Session session, SeStreamOp streamOperation)
             throws IOException {
 
         try {
             if (defaultVersion == null) {
-                defaultVersion = connection.createSeVersion(SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME);
+                defaultVersion = session.createSeVersion(SeVersion.SE_QUALIFIED_DEFAULT_VERSION_NAME);
                 defaultVersion.getInfo();
-                SeState currentState = connection.createSeState(defaultVersion.getStateId());
+                SeState currentState = session.createSeState(defaultVersion.getStateId());
                 if (!currentState.isOpen()) {
-                    SeState newState = connection.createSeState(null);
+                    SeState newState = session.createSeState(null);
                     newState.create(currentState.getId());
                     defaultVersion.changeState(newState.getId());
                 }

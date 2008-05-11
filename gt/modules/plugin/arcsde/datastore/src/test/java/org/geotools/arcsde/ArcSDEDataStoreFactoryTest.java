@@ -174,11 +174,11 @@ public class ArcSDEDataStoreFactoryTest extends TestCase {
      * @throws SeException
      */
     public void testCreateDataStoreWithInProcessViews() throws IOException, SeException {
-        Session conn = testData.getConnectionPool().getConnection();
+        Session session = testData.getConnectionPool().getConnection();
         try {
-            InProcessViewSupportTestData.setUp(conn, testData);
+            InProcessViewSupportTestData.setUp(session, testData);
         } finally {
-            conn.close();
+            session.close();
         }
 
         Map workingParamsWithSqlView = new HashMap(workingParams);

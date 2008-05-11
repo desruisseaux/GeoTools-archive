@@ -38,18 +38,18 @@ class SubSelectQualifier {
     /**
      * DOCUMENT ME!
      * 
-     * @param conn
+     * @param session
      *            DOCUMENT ME!
      * @param subSelect
      *            DOCUMENT ME!
      * 
      * @return DOCUMENT ME!
      */
-    public static SubSelect qualify(Session conn, SubSelect subSelect) {
+    public static SubSelect qualify(Session session, SubSelect subSelect) {
         String alias = subSelect.getAlias();
         SelectBody select = subSelect.getSelectBody();
 
-        SelectQualifier visitor = new SelectQualifier(conn);
+        SelectQualifier visitor = new SelectQualifier(session);
         select.accept(visitor);
 
         PlainSelect qualifiedSelect = visitor.getQualifiedQuery();

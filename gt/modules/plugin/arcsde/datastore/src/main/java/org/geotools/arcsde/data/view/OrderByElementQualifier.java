@@ -41,37 +41,37 @@ public class OrderByElementQualifier implements OrderByVisitor {
     private OrderByElement _qualifiedOrderBy;
 
     /** DOCUMENT ME! */
-    private Session conn;
+    private Session session;
 
     private Map tableAliases;
 
     /**
      * Creates a new OrderByElementQualifier object.
      * 
-     * @param conn
+     * @param session
      *            DOCUMENT ME!
      */
-    private OrderByElementQualifier(Session conn, Map tableAliases) {
-        this.conn = conn;
+    private OrderByElementQualifier(Session session, Map tableAliases) {
+        this.session = session;
         this.tableAliases = tableAliases;
     }
 
     /**
      * DOCUMENT ME!
      * 
-     * @param conn
+     * @param session
      *            DOCUMENT ME!
      * @param orderBy
      *            DOCUMENT ME!
      * 
      * @return DOCUMENT ME!
      */
-    public static OrderByElement qualify(Session conn, Map tableAliases, OrderByElement orderBy) {
+    public static OrderByElement qualify(Session session, Map tableAliases, OrderByElement orderBy) {
         if (orderBy == null) {
             return null;
         }
 
-        OrderByElementQualifier qualifier = new OrderByElementQualifier(conn, tableAliases);
+        OrderByElementQualifier qualifier = new OrderByElementQualifier(session, tableAliases);
         orderBy.accept(qualifier);
 
         return qualifier._qualifiedOrderBy;
@@ -89,7 +89,7 @@ public class OrderByElementQualifier implements OrderByVisitor {
 
         ColumnReference colRef = orderBy.getColumnReference();
 
-        ColumnReference qualifiedColRef = ColumnReferenceQualifier.qualify(conn, tableAliases,
+        ColumnReference qualifiedColRef = ColumnReferenceQualifier.qualify(session, tableAliases,
                 colRef);
 
         qualifiedOrderBy.setColumnReference(qualifiedColRef);

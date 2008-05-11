@@ -239,10 +239,10 @@ public class ArcSDEAdapter {
      */
     public static FeatureTypeInfo fetchSchema(final String typeName,
             final String namespace,
-            final Session connection) throws IOException {
+            final Session session) throws IOException {
 
-        final SeLayer layer = connection.getLayer(typeName);
-        final SeTable table = connection.getTable(typeName);
+        final SeLayer layer = session.getLayer(typeName);
+        final SeTable table = session.getTable(typeName);
 
         final List<AttributeDescriptor> properties = createAttributeDescriptors(layer, table,
                 namespace);
@@ -251,14 +251,14 @@ public class ArcSDEAdapter {
 
         SeRegistration registration;
         try {
-            registration = connection.createSeRegistration(typeName);
+            registration = session.createSeRegistration(typeName);
         } catch (SeException e) {
             throw new ArcSdeException("Can't get a registration object for " + typeName, e);
         }
         final boolean isMultiVersioned = registration.isMultiVersion();
         final boolean isView = registration.isView();
         final FIDReader fidStrategy;
-        fidStrategy = FIDReader.getFidReader(connection, table, layer, registration);
+        fidStrategy = FIDReader.getFidReader(session, table, layer, registration);
         final boolean canDoTransactions;
         {
             final boolean hasWritePermissions = userHasWritePermissions(table);
@@ -307,7 +307,7 @@ public class ArcSDEAdapter {
     /**
      * Creates a schema for the "SQL SELECT" like view definition
      */
-    public static FeatureTypeInfo createInprocessViewSchema(final Session conn,
+    public static FeatureTypeInfo createInprocessViewSchema(final Session session,
             final String typeName,
             final String namespace,
             final PlainSelect qualifiedSelect,
@@ -326,7 +326,7 @@ public class ArcSDEAdapter {
 
         SeLayer layer = null;
         try {
-            layer = conn.getLayer(mainTable);
+            layer = session.getLayer(mainTable);
         } catch (NoSuchElementException e) {
             LOGGER.info(mainTable + " is not an SeLayer, so no CRS info will be parsed");
         }
@@ -334,7 +334,7 @@ public class ArcSDEAdapter {
 
         final SeQuery testQuery;
         try {
-            testQuery = conn.createSeQuery();
+            testQuery = session.createSeQuery();
         } catch (SeException e) {
             throw new ArcSdeException(e);
         }
@@ -859,7 +859,7 @@ public class ArcSDEAdapter {
      *            system of the new ArcSDE layer.
      * @param hints A map containing extra ArcSDE-specific hints about how to create the underlying
      *            ArcS DE SeLayer and SeTable objects from this FeatureType.
-     * @param connection connection to use in order to create the layer and table on the server. The
+     * @param session connection to use in order to create the layer and table on the server. The
      *            connection shall be managed by this method caller.
      * @throws IOException see <code>throws DataSourceException</code> bellow
      * @throws IllegalArgumentException if the passed feature type does not contains at least one
@@ -873,7 +873,7 @@ public class ArcSDEAdapter {
      */
     public static void createSchema(final SimpleFeatureType featureType,
             final Map hints,
-            final Session connection) throws IOException, IllegalArgumentException {
+            final Session session) throws IOException, IllegalArgumentException {
         if (featureType == null) {
             throw new NullPointerException("You have to provide a FeatureType instance");
         }
@@ -929,20 +929,20 @@ public class ArcSDEAdapter {
             String qualifiedName = null;
 
             if (unqualifiedTypeName.indexOf('.') == -1) {
-                qualifiedName = connection.getUser() + "." + featureType.getTypeName();
+                qualifiedName = session.getUser() + "." + featureType.getTypeName();
                 LOGGER.finer("new full qualified type name: " + qualifiedName);
             } else {
                 qualifiedName = unqualifiedTypeName;
                 LOGGER.finer("full qualified type name provided by user: " + qualifiedName);
             }
 
-            layer = connection.createSeLayer();
+            layer = session.createSeLayer();
             layer.setTableName(qualifiedName);
             layer.setCreationKeyword(configKeyword);
 
             final String HACK_COL_NAME = "gt_workaround_col_";
 
-            table = createSeTable(connection, qualifiedName, HACK_COL_NAME, configKeyword);
+            table = createSeTable(session, qualifiedName, HACK_COL_NAME, configKeyword);
             tableCreated = true;
 
             final List<AttributeDescriptor> atts = featureType.getAttributes();
@@ -983,7 +983,7 @@ public class ArcSDEAdapter {
             table.dropColumn(HACK_COL_NAME);
 
             LOGGER.fine("setting up table registration with ArcSDE...");
-            SeRegistration reg = connection.createSeRegistration( table.getName() );
+            SeRegistration reg = session.createSeRegistration( table.getName() );
             if (rowIdColumn != null) {
                 LOGGER.fine("setting rowIdColumnName to " + rowIdColumn + " in table "
                         + reg.getTableName());
@@ -1006,14 +1006,14 @@ public class ArcSDEAdapter {
         }
     }
 
-    private static SeTable createSeTable(Session connection,
+    private static SeTable createSeTable(Session session,
             String qualifiedName,
             String hackColName,
             String configKeyword) throws SeException {
         SeTable table;
         final SeColumnDefinition[] tmpCol = { new SeColumnDefinition(hackColName,
                 SeColumnDefinition.TYPE_STRING, 4, 0, true) };
-        table = connection.createSeTable(qualifiedName);
+        table = session.createSeTable(qualifiedName);
 
         try {
             LOGGER.warning("Remove the line 'table.delete()' for production use!!!");

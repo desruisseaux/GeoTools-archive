@@ -38,7 +38,7 @@ class TableQualifier {
      * Returns a Table with the same name as the argument one but fully
      * qualified in the ArcSDE sense.
      * 
-     * @param conn
+     * @param session
      *            connection to obtain database and user name from
      * @param table
      *            table whose schema name is to be qualified
@@ -49,7 +49,7 @@ class TableQualifier {
      *             if an SDE error is catched up while asking <code>conn</code>
      *             for the database and user name.
      */
-    public static Table qualify(Session conn, Table table) throws IllegalStateException {
+    public static Table qualify(Session session, Table table) throws IllegalStateException {
         if (table == null) {
             return null;
         }
@@ -65,8 +65,8 @@ class TableQualifier {
 
         // if (schema != null) {
         try {
-            databaseName = conn.getDatabaseName();
-            userName = conn.getUser();
+            databaseName = session.getDatabaseName();
+            userName = session.getUser();
         } catch (SeException e) {
             throw new IllegalStateException("getting database name: " + e.getMessage());
         }

@@ -203,19 +203,19 @@ public class ArcSDEDataStore implements DataStore {
         assert query.getFilter() != null;
         assert transaction != null;
 
-        Session connection;
+        Session session;
         ArcSdeVersionHandler versionHandler = ArcSdeVersionHandler.NONVERSIONED_HANDLER;
         {
             final FeatureTypeInfo featureTypeInfo = getFeatureTypeInfo(typeName);
             final boolean versioned = featureTypeInfo.isVersioned();
 
             if (Transaction.AUTO_COMMIT.equals(transaction)) {
-                connection = connectionPool.getConnection();
+                session = connectionPool.getConnection();
             } else {
                 ArcTransactionState state = ArcTransactionState.getState(transaction,
                         connectionPool, listenerManager, versioned);
                 versionHandler = state.getVersionHandler();
-                connection = state.getConnection();
+                session = state.getConnection();
             }
         }
 
@@ -223,7 +223,7 @@ public class ArcSDEDataStore implements DataStore {
         // if it's not inside a transaction.
         final boolean handleConnection = true;
         FeatureReader<SimpleFeatureType, SimpleFeature> reader = getFeatureReader(query,
-                connection, handleConnection, versionHandler);
+                session, handleConnection, versionHandler);
 
         return reader;
     }
@@ -237,7 +237,7 @@ public class ArcSDEDataStore implements DataStore {
      * </p>
      * 
      * @param query the Query containing the request criteria
-     * @param connection the connection to use to retrieve content. It'll be closed by the returned
+     * @param session the session to use to retrieve content. It'll be closed by the returned
      *            FeatureReader<SimpleFeatureType, SimpleFeature> only if the connection does not
      *            has a {@link Session#isTransactionActive() transaction in progress}.
      * @param readerClosesConnection flag indicating whether the reader should auto-close the
@@ -247,13 +247,13 @@ public class ArcSDEDataStore implements DataStore {
      * @throws IOException
      */
     FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(final Query query,
-            final Session connection,
+            final Session session,
             final boolean readerClosesConnection,
             final ArcSdeVersionHandler versionHandler) throws IOException {
         final String typeName = query.getTypeName();
         final String propertyNames[] = query.getPropertyNames();
 
-        final FeatureTypeInfo typeInfo = getFeatureTypeInfo(typeName, connection);
+        final FeatureTypeInfo typeInfo = getFeatureTypeInfo(typeName, session);
         final SimpleFeatureType completeSchema = typeInfo.getFeatureType();
         final ArcSDEQuery sdeQuery;
 
@@ -277,11 +277,11 @@ public class ArcSDEDataStore implements DataStore {
         if (typeInfo.isInProcessView()) {
             SeQueryInfo definitionQuery = typeInfo.getSdeDefinitionQuery();
             PlainSelect viewSelectStatement = typeInfo.getDefinitionQuery();
-            sdeQuery = ArcSDEQuery.createInprocessViewQuery(connection, completeSchema, query,
+            sdeQuery = ArcSDEQuery.createInprocessViewQuery(session, completeSchema, query,
                     definitionQuery, viewSelectStatement);
         } else {
             final FIDReader fidStrategy = typeInfo.getFidStrategy();
-            sdeQuery = ArcSDEQuery.createQuery(connection, completeSchema, query, fidStrategy,
+            sdeQuery = ArcSDEQuery.createQuery(session, completeSchema, query, fidStrategy,
                     versionHandler);
         }
 
@@ -289,7 +289,7 @@ public class ArcSDEDataStore implements DataStore {
 
         // this is the one which's gonna close the connection when done
         final ArcSDEAttributeReader attReader;
-        attReader = new ArcSDEAttributeReader(sdeQuery, connection, readerClosesConnection);
+        attReader = new ArcSDEAttributeReader(sdeQuery, session, readerClosesConnection);
         FeatureReader<SimpleFeatureType, SimpleFeature> reader;
         try {
             reader = new ArcSDEFeatureReader(attReader);
@@ -298,7 +298,7 @@ public class ArcSDEDataStore implements DataStore {
                     e);
         }
 
-        filter = getUnsupportedFilter(typeInfo, filter, connection);
+        filter = getUnsupportedFilter(typeInfo, filter, session);
         if (!filter.equals(Filter.INCLUDE)) {
             reader = new FilteringFeatureReader<SimpleFeatureType, SimpleFeature>(reader, filter);
         }
@@ -392,21 +392,21 @@ public class ArcSDEDataStore implements DataStore {
      * @param transaction
      */
     void getConnection( ArcSDERunnable runnable, String typeName, Transaction transaction ) throws IOException {
-        final Session connection;
+        final Session session;
         final ArcTransactionState state;
         
         if (Transaction.AUTO_COMMIT.equals(transaction)) {
-            connection = connectionPool.getConnection();
+            session = connectionPool.getConnection();
             state = null;
         } else {
             state = ArcTransactionState.getState(transaction, connectionPool, listenerManager, false );
-            connection = state.getConnection();
+            session = state.getConnection();
         }
         try {
-            runnable.run( connection );
+            runnable.run( session );
         }
         finally {
-            connection.close(); // return to pool
+            session.close(); // return to pool
         }
     }
     /**
@@ -417,7 +417,7 @@ public class ArcSDEDataStore implements DataStore {
             final Transaction transaction) throws IOException {
         // get the connection the streamed writer content has to work over
         // so the reader and writer share it
-        final Session connection;
+        final Session session;
         final ArcTransactionState state;
         final boolean versioned;
         final ArcSdeVersionHandler versionHandler = getVersionHandler(typeName, transaction);
@@ -426,17 +426,17 @@ public class ArcSDEDataStore implements DataStore {
             versioned = featureTypeInfo.isVersioned();
 
             if (Transaction.AUTO_COMMIT.equals(transaction)) {
-                connection = connectionPool.getConnection();
+                session = connectionPool.getConnection();
                 state = null;
             } else {
                 state = ArcTransactionState.getState(transaction, connectionPool, listenerManager,
                         versioned);
-                connection = state.getConnection();
+                session = state.getConnection();
             }
         }
 
         try {
-            final FeatureTypeInfo typeInfo = getFeatureTypeInfo(typeName, connection);
+            final FeatureTypeInfo typeInfo = getFeatureTypeInfo(typeName, session);
             if (!typeInfo.isWritable()) {
                 throw new DataSourceException(typeName + " is not writable");
             }
@@ -446,14 +446,14 @@ public class ArcSDEDataStore implements DataStore {
             // don't let the reader close the connection as the writer needs it
             final boolean closeConnection = false;
             final FeatureReader<SimpleFeatureType, SimpleFeature> reader;
-            reader = getFeatureReader(query, connection, closeConnection, versionHandler);
+            reader = getFeatureReader(query, session, closeConnection, versionHandler);
 
             final FeatureWriter<SimpleFeatureType, SimpleFeature> writer;
 
             final FIDReader fidReader = typeInfo.getFidStrategy();
 
             if (Transaction.AUTO_COMMIT == transaction) {
-                writer = new AutoCommitFeatureWriter(fidReader, featureType, reader, connection,
+                writer = new AutoCommitFeatureWriter(fidReader, featureType, reader, session,
                         listenerManager, versionHandler);
             } else {
                 // if there's a transaction, the reader and the writer will
@@ -464,19 +464,19 @@ public class ArcSDEDataStore implements DataStore {
             return writer;
         } catch (IOException e) {
             try {
-                connection.rollbackTransaction();
+                session.rollbackTransaction();
             } catch (SeException e1) {
-                LOGGER.log(Level.SEVERE, "Error rolling back transaction on " + connection, e);
+                LOGGER.log(Level.SEVERE, "Error rolling back transaction on " + session, e);
             }
-            connection.close();
+            session.close();
             throw e;
         } catch (RuntimeException e) {
             try {
-                connection.rollbackTransaction();
+                session.rollbackTransaction();
             } catch (SeException e1) {
-                LOGGER.log(Level.SEVERE, "Error rolling back transaction on " + connection, e);
+                LOGGER.log(Level.SEVERE, "Error rolling back transaction on " + session, e);
             }
-            connection.close();
+            session.close();
             throw e;
         }
     }
@@ -577,7 +577,7 @@ public class ArcSDEDataStore implements DataStore {
      */
     private org.opengis.filter.Filter getUnsupportedFilter(final FeatureTypeInfo typeInfo,
             final Filter filter,
-            final Session conn) {
+            final Session session) {
         try {
             SeLayer layer;
             SeQueryInfo qInfo;
@@ -590,9 +590,9 @@ public class ArcSDEDataStore implements DataStore {
                 } catch (SeException e) {
                     throw new ArcSdeException(e);
                 }
-                layer = conn.getLayer(mainLayerName);
+                layer = session.getLayer(mainLayerName);
             } else {
-                layer = conn.getLayer(typeInfo.getFeatureTypeName());
+                layer = session.getLayer(typeInfo.getFeatureTypeName());
                 qInfo = null;
             }
 
@@ -663,16 +663,16 @@ public class ArcSDEDataStore implements DataStore {
      * @return Generated FeatureTypeInfo for typeName
      */
     protected synchronized FeatureTypeInfo getFeatureTypeInfo( String typeName, ArcSDEConnectionPool pool ) throws IOException {
-        final Session conn = getConnectionPool().getConnection();
+        final Session session = getConnectionPool().getConnection();
         try {
-            return getFeatureTypeInfo(typeName, conn);
+            return getFeatureTypeInfo(typeName, session);
         } finally {
-            conn.close();
+            session.close();
         }
     }
     
     synchronized FeatureTypeInfo getFeatureTypeInfo(final String typeName,
-            final Session connection) throws IOException {
+            final Session session) throws IOException {
 
         FeatureTypeInfo ftInfo = inProcessFeatureTypeInfos.get(typeName);
 
@@ -680,7 +680,7 @@ public class ArcSDEDataStore implements DataStore {
             synchronized (featureTypeInfos) {
                 ftInfo = featureTypeInfos.get(typeName);
                 if (ftInfo == null) {
-                    ftInfo = ArcSDEAdapter.fetchSchema(typeName, this.namespace, connection);
+                    ftInfo = ArcSDEAdapter.fetchSchema(typeName, this.namespace, session);
                     featureTypeInfos.put(typeName, ftInfo);
                 }
             }
@@ -714,11 +714,11 @@ public class ArcSDEDataStore implements DataStore {
      */
     public void createSchema(final SimpleFeatureType featureType, final Map<String, String> hints)
             throws IOException, IllegalArgumentException {
-        final Session connection = connectionPool.getConnection();
+        final Session session = connectionPool.getConnection();
         try {
-            ArcSDEAdapter.createSchema(featureType, hints, connection);
+            ArcSDEAdapter.createSchema(featureType, hints, session);
         } finally {
-            connection.close();
+            session.close();
         }
     }
 
@@ -746,25 +746,25 @@ public class ArcSDEDataStore implements DataStore {
 
         verifyQueryIsSupported(select);
 
-        final Session conn = connectionPool.getConnection();
+        final Session session = connectionPool.getConnection();
 
         try {
-            final PlainSelect qualifiedSelect = SelectQualifier.qualify(conn, select);
+            final PlainSelect qualifiedSelect = SelectQualifier.qualify(session, select);
             // System.out.println(qualifiedSelect);
 
             final SeQueryInfo queryInfo;
             try {
                 LOGGER.fine("creating definition query info");
-                queryInfo = QueryInfoParser.parse(conn, qualifiedSelect);
+                queryInfo = QueryInfoParser.parse(session, qualifiedSelect);
             } catch (SeException e) {
                 throw new ArcSdeException("Error Parsing select: " + qualifiedSelect, e);
             }
-            FeatureTypeInfo typeInfo = ArcSDEAdapter.createInprocessViewSchema(conn, typeName,
+            FeatureTypeInfo typeInfo = ArcSDEAdapter.createInprocessViewSchema(session, typeName,
                     namespace, qualifiedSelect, queryInfo);
 
             inProcessFeatureTypeInfos.put(typeName, typeInfo);
         } finally {
-            conn.close();
+            session.close();
         }
     }
 

@@ -44,7 +44,7 @@ public class OneBitBandReaderTest {
         rasterTestData.setUp();
         rasterTestData.load1bitRaster();
 
-        Session scon = null;
+        Session session = null;
         SeQuery q = null;
         ArcSDEPyramid pyramid;
         SeRow r;
@@ -52,16 +52,16 @@ public class OneBitBandReaderTest {
         try {
 
             // Set up a pyramid and readerprops for the sample three-band imagery
-            scon = rasterTestData.getTestData().getConnectionPool().getConnection();
+            session = rasterTestData.getTestData().getConnectionPool().getConnection();
             tableName = rasterTestData.get1bitRasterTableName();
-            q = new SeQuery(scon.unWrap(), new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+            q = new SeQuery(session.unWrap(), new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
             r = q.fetch();
             rasterAttr = r.getRaster(0);
             q.close();
 
-            SeRasterColumn rcol = new SeRasterColumn(scon.unWrap(), rasterAttr.getRasterColumnId());
+            SeRasterColumn rcol = new SeRasterColumn(session.unWrap(), rasterAttr.getRasterColumnId());
 
             CoordinateReferenceSystem crs = CRS.decode("EPSG:2805");
             pyramid = new ArcSDEPyramid(rasterAttr, crs);
@@ -76,8 +76,8 @@ public class OneBitBandReaderTest {
         } finally {
             if (q != null)
                 q.close();
-            if (scon != null) {
-                scon.close();
+            if (session != null) {
+                session.close();
             }
         }
     }
@@ -92,9 +92,9 @@ public class OneBitBandReaderTest {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(readerProps);
 
-        Session scon = null;
+        Session session = null;
         try {
-            scon = rasterTestData.getTestData().getConnectionPool().getConnection();
+            session = rasterTestData.getTestData().getConnectionPool().getConnection();
 
             SeRasterBand[] bands = rasterAttr.getBands();
             HashMap<Integer, Integer> bandMapper = new HashMap<Integer, Integer>();
@@ -112,7 +112,7 @@ public class OneBitBandReaderTest {
 
             ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
             rParam.setSourceBands(new int[] { 1 });
-            rParam.setConnection(scon);
+            rParam.setConnection(session);
             rParam.setSourceRegion(new Rectangle(dataOffset.x, dataOffset.y, w, h));
             rParam.setDestination(image);
             rParam.setDestinationOffset(imageOffset);
@@ -138,8 +138,8 @@ public class OneBitBandReaderTest {
         } catch (Exception e) {
             throw e;
         } finally {
-            if (scon != null && !scon.isClosed())
-                scon.close();
+            if (session != null && !session.isClosed())
+                session.close();
         }
     }
 
@@ -148,9 +148,9 @@ public class OneBitBandReaderTest {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(readerProps);
 
-        Session scon = null;
+        Session session = null;
         try {
-            scon = rasterTestData.getTestData().getConnectionPool().getConnection();
+            session = rasterTestData.getTestData().getConnectionPool().getConnection();
 
             SeRasterBand[] bands = rasterAttr.getBands();
             HashMap<Integer, Integer> bandMapper = new HashMap<Integer, Integer>();
@@ -168,7 +168,7 @@ public class OneBitBandReaderTest {
 
             ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
             rParam.setSourceBands(new int[] { 1 });
-            rParam.setConnection(scon);
+            rParam.setConnection(session);
             rParam.setSourceRegion(new Rectangle(dataOffset.x, dataOffset.y, w, h));
             rParam.setDestination(image);
             rParam.setDestinationOffset(imageOffset);
@@ -194,8 +194,8 @@ public class OneBitBandReaderTest {
         } catch (Exception e) {
             throw e;
         } finally {
-            if (scon != null && !scon.isClosed())
-                scon.close();
+            if (session != null && !session.isClosed())
+                session.close();
         }
     }
 
@@ -204,9 +204,9 @@ public class OneBitBandReaderTest {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(readerProps);
 
-        Session scon = null;
+        Session session = null;
         try {
-            scon = rasterTestData.getTestData().getConnectionPool().getConnection();
+            session = rasterTestData.getTestData().getConnectionPool().getConnection();
 
             SeRasterBand[] bands = rasterAttr.getBands();
             HashMap<Integer, Integer> bandMapper = new HashMap<Integer, Integer>();
@@ -224,7 +224,7 @@ public class OneBitBandReaderTest {
 
             ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
             rParam.setSourceBands(new int[] { 1 });
-            rParam.setConnection(scon);
+            rParam.setConnection(session);
             rParam.setSourceRegion(new Rectangle(dataOffset.x, dataOffset.y, w, h));
             rParam.setDestination(image);
             rParam.setDestinationOffset(imageOffset);
@@ -250,8 +250,8 @@ public class OneBitBandReaderTest {
         } catch (Exception e) {
             throw e;
         } finally {
-            if (scon != null && !scon.isClosed())
-                scon.close();
+            if (session != null && !session.isClosed())
+                session.close();
         }
     }
 
@@ -260,9 +260,9 @@ public class OneBitBandReaderTest {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(readerProps);
 
-        Session scon = null;
+        Session session = null;
         try {
-            scon = rasterTestData.getTestData().getConnectionPool().getConnection();
+            session = rasterTestData.getTestData().getConnectionPool().getConnection();
 
             SeRasterBand[] bands = rasterAttr.getBands();
             HashMap<Integer, Integer> bandMapper = new HashMap<Integer, Integer>();
@@ -280,7 +280,7 @@ public class OneBitBandReaderTest {
 
             ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
             rParam.setSourceBands(new int[] { 1 });
-            rParam.setConnection(scon);
+            rParam.setConnection(session);
             rParam.setSourceRegion(new Rectangle(dataOffset.x, dataOffset.y, w, h));
             rParam.setDestination(image);
             rParam.setDestinationOffset(imageOffset);
@@ -308,8 +308,8 @@ public class OneBitBandReaderTest {
         } catch (Exception e) {
             throw e;
         } finally {
-            if (scon != null && !scon.isClosed())
-                scon.close();
+            if (session != null && !session.isClosed())
+                session.close();
         }
     }
 
@@ -318,9 +318,9 @@ public class OneBitBandReaderTest {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(readerProps);
 
-        Session scon = null;
+        Session session = null;
         try {
-            scon = rasterTestData.getTestData().getConnectionPool().getConnection();
+            session = rasterTestData.getTestData().getConnectionPool().getConnection();
 
             SeRasterBand[] bands = rasterAttr.getBands();
             HashMap<Integer, Integer> bandMapper = new HashMap<Integer, Integer>();
@@ -338,7 +338,7 @@ public class OneBitBandReaderTest {
 
             ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
             rParam.setSourceBands(new int[] { 1 });
-            rParam.setConnection(scon);
+            rParam.setConnection(session);
             rParam.setSourceRegion(new Rectangle(dataOffset.x, dataOffset.y, w, h));
             rParam.setDestination(image);
             rParam.setDestinationOffset(imageOffset);
@@ -366,8 +366,8 @@ public class OneBitBandReaderTest {
         } catch (Exception e) {
             throw e;
         } finally {
-            if (scon != null && !scon.isClosed())
-                scon.close();
+            if (session != null && !session.isClosed())
+                session.close();
         }
     }
 
@@ -376,9 +376,9 @@ public class OneBitBandReaderTest {
         ArcSDERasterReader reader = (ArcSDERasterReader) new ArcSDERasterReaderSpi()
                 .createReaderInstance(readerProps);
 
-        Session scon = null;
+        Session session = null;
         try {
-            scon = rasterTestData.getTestData().getConnectionPool().getConnection();
+            session = rasterTestData.getTestData().getConnectionPool().getConnection();
 
             SeRasterBand[] bands = rasterAttr.getBands();
             HashMap<Integer, Integer> bandMapper = new HashMap<Integer, Integer>();
@@ -396,7 +396,7 @@ public class OneBitBandReaderTest {
 
             ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
             rParam.setSourceBands(new int[] { 1 });
-            rParam.setConnection(scon);
+            rParam.setConnection(session);
             rParam.setSourceRegion(new Rectangle(dataOffset.x, dataOffset.y, w, h));
             rParam.setDestination(image);
             rParam.setDestinationOffset(imageOffset);
@@ -424,8 +424,8 @@ public class OneBitBandReaderTest {
         } catch (Exception e) {
             throw e;
         } finally {
-            if (scon != null && !scon.isClosed())
-                scon.close();
+            if (session != null && !session.isClosed())
+                session.close();
         }
     }
 

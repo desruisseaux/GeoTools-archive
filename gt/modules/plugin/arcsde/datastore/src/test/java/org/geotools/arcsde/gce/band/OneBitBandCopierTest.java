@@ -50,12 +50,12 @@ public class OneBitBandCopierTest {
     public void testLiveOneBitAlignedRasterTile() throws Exception {
         final String tableName = rasterTestData.get1bitRasterTableName();
 
-        Session scon = null;
+        Session session = null;
         try {
             ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
 
-            scon = pool.getConnection();
-            SeQuery q = new SeQuery(scon.unWrap(), new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+            session = pool.getConnection();
+            SeQuery q = new SeQuery(session.unWrap(), new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
             SeRow r = q.fetch();
@@ -93,8 +93,8 @@ public class OneBitBandCopierTest {
         } catch (SeException se) {
             LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
         } finally {
-            if (scon != null)
-                scon.close();
+            if (session != null)
+                session.close();
         }
     }
 
@@ -102,12 +102,12 @@ public class OneBitBandCopierTest {
     public void testLiveOneBitUnalignedRasterTile() throws Exception {
         final String tableName = rasterTestData.get1bitRasterTableName();
 
-        Session scon = null;
+        Session session = null;
         try {
             ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
 
-            scon = pool.getConnection();
-            SeQuery q = new SeQuery(scon.unWrap(), new String[] { "RASTER" }, new SeSqlConstruct(tableName));
+            session = pool.getConnection();
+            SeQuery q = new SeQuery(session.unWrap(), new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
             SeRow r = q.fetch();
@@ -149,8 +149,8 @@ public class OneBitBandCopierTest {
         } catch (SeException se) {
             LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
         } finally {
-            if (scon != null)
-                scon.close();
+            if (session != null)
+                session.close();
         }
     }
 

@@ -95,7 +95,7 @@ final class ArcSDEAttributeReader implements AttributeReader {
      */
     private final Class<? extends Geometry> schemaGeometryClass;
 
-    private Session connection;
+    private Session session;
 
     /**
      * Flag indicating whether to close or not the connection.
@@ -115,7 +115,7 @@ final class ArcSDEAttributeReader implements AttributeReader {
      * 
      * @param query the {@link SeQuery} wrapper where to fetch rows from. Must NOT be already
      *            {@link ArcSDEQuery#execute() executed}.
-     * @param connection the connection the <code>query</code> is being ran over. This attribute
+     * @param session the session the <code>query</code> is being ran over. This attribute
      *            reader will close it only if it does not have a transaction in progress.
      * @param handleConnectionClosing whether to close or not the connection when done. Useful to
      *            allow a feature reader working over this attribute reader to stream out the
@@ -123,10 +123,10 @@ final class ArcSDEAttributeReader implements AttributeReader {
      * @throws IOException
      */
     public ArcSDEAttributeReader(final ArcSDEQuery query,
-                                 final Session connection,
+                                 final Session session,
                                  final boolean handleConnectionClosing) throws IOException {
         this.query = query;
-        this.connection = connection;
+        this.session = session;
         this.handleConnectionClosing = handleConnectionClosing;
         this.fidReader = query.getFidReader();
         this.schema = query.getSchema();
@@ -145,11 +145,11 @@ final class ArcSDEAttributeReader implements AttributeReader {
         }
         // get the lock before executing the query so streams don't get confused,
         // and keep it until close() is called on this class
-        connection.getLock().lock();
+        session.getLock().lock();
         try {
             query.execute();
         } catch (IOException e) {
-            connection.getLock().unlock();
+            session.getLock().unlock();
             throw e;
         }
     }
@@ -176,15 +176,15 @@ final class ArcSDEAttributeReader implements AttributeReader {
         if (query != null) {
             this.query.close();
             if (handleConnectionClosing) {
-                if (!connection.isTransactionActive()) {
-                    connection.close();
+                if (!session.isTransactionActive()) {
+                    session.close();
                 }
             }
-            if (connection != null) {
-                connection.getLock().unlock();
+            if (session != null) {
+                session.getLock().unlock();
             }
             query = null;
-            connection = null;
+            session = null;
             schema = null;
             fidReader = null;
             currentRow = null;

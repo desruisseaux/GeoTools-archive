@@ -103,23 +103,23 @@ public class ArcSDEPyramidTest extends TestCase {
      */
     public void donttestArcSDEPyramidThreeBand() throws Exception {
 
-        Session scon = pool.getConnection();
+        Session session = pool.getConnection();
         SeRasterAttr rAttr;
         try {
-            SeQuery q = scon.createSeQuery(new String[] { "RASTER" }, new SeSqlConstruct(conProps
+            SeQuery q = session.createSeQuery(new String[] { "RASTER" }, new SeSqlConstruct(conProps
                     .getProperty("threebandtable")));
             q.prepareQuery();
             q.execute();
             SeRow r = q.fetch();
             rAttr = r.getRaster(0);
         } catch (SeException se) {
-            scon.close();
+            session.close();
             throw new RuntimeException(se.getSeError().getErrDesc(), se);
         }
 
         CoordinateReferenceSystem crs = CRS.decode(conProps.getProperty("tableCRS"));
         ArcSDEPyramid pyramid = new ArcSDEPyramid(rAttr, crs);
-        scon.close();
+        session.close();
 
         assertTrue(pyramid.getPyramidLevel(0).getYOffset() != 0);
 
@@ -151,23 +151,23 @@ public class ArcSDEPyramidTest extends TestCase {
      */
     public void testArcSDEPyramidFourBand() throws Exception {
 
-        Session scon = pool.getConnection();
+        Session session = pool.getConnection();
         SeRasterAttr rAttr;
         try {
-            SeQuery q = scon.createSeQuery(new String[] { "RASTER" }, new SeSqlConstruct(conProps
+            SeQuery q = session.createSeQuery(new String[] { "RASTER" }, new SeSqlConstruct(conProps
                     .getProperty("fourbandtable")));
             q.prepareQuery();
             q.execute();
             SeRow r = q.fetch();
             rAttr = r.getRaster(0);
         } catch (SeException se) {
-            scon.close();
+            session.close();
             throw new RuntimeException(se.getSeError().getErrDesc(), se);
         }
 
         CoordinateReferenceSystem crs = CRS.decode(conProps.getProperty("tableCRS"));
         ArcSDEPyramid pyramid = new ArcSDEPyramid(rAttr, crs);
-        scon.close();
+        session.close();
 
         assertTrue(pyramid.getPyramidLevel(0).getYOffset() != 0);
 

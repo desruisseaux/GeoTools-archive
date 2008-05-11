@@ -182,11 +182,11 @@ public class SDEJavaApiJoinTest extends TestCase {
         testData = new TestData();
         testData.setUp();
 
-        Session conn = testData.getConnectionPool().getConnection();
+        Session session = testData.getConnectionPool().getConnection();
         try {
-            InProcessViewSupportTestData.setUp(conn, testData);
+            InProcessViewSupportTestData.setUp(session, testData);
         } finally {
-            conn.close();
+            session.close();
         }
     }
 
@@ -475,7 +475,7 @@ public class SDEJavaApiJoinTest extends TestCase {
      * @throws Exception
      */
     public void testApiOrderBy() throws Exception {
-        Session conn = store.getConnectionPool().getConnection();
+        Session session = store.getConnectionPool().getConnection();
 
         SeSqlConstruct sqlConstruct = new SeSqlConstruct();
         String[] tables = { InProcessViewSupportTestData.MASTER, InProcessViewSupportTestData.CHILD };
@@ -495,7 +495,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         final int shapeIndex = 5;
         final int expectedCount = 7;
 
-        SeQuery query = conn.createSeQuery();
+        SeQuery query = session.createSeQuery();
 
         SeQueryInfo queryInfo = new SeQueryInfo();
         queryInfo.setConstruct(sqlConstruct);
@@ -538,7 +538,7 @@ public class SDEJavaApiJoinTest extends TestCase {
             e.printStackTrace();
             throw e;
         } finally {
-            conn.close();
+            session.close();
         }
     }
 
@@ -549,7 +549,7 @@ public class SDEJavaApiJoinTest extends TestCase {
      * @throws Exception
      */
     public void testApiAlias() throws Exception {
-        Session conn = store.getConnectionPool().getConnection();
+        Session session = store.getConnectionPool().getConnection();
 
         SeSqlConstruct sqlConstruct = new SeSqlConstruct();
         String[] tables = { InProcessViewSupportTestData.MASTER + " AS MASTER",
@@ -564,7 +564,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         final int shapeIndex = 2;
         final int expectedCount = 7;
 
-        SeQuery query = conn.createSeQuery();
+        SeQuery query = session.createSeQuery();
 
         SeQueryInfo queryInfo = new SeQueryInfo();
         queryInfo.setConstruct(sqlConstruct);
@@ -592,7 +592,7 @@ public class SDEJavaApiJoinTest extends TestCase {
             e.printStackTrace();
             throw e;
         } finally {
-            conn.close();
+            session.close();
         }
     }
 
@@ -604,7 +604,7 @@ public class SDEJavaApiJoinTest extends TestCase {
      * @throws Exception
      */
     public void testApiGroupBy() throws Exception {
-        Session conn = store.getConnectionPool().getConnection();
+        Session session = store.getConnectionPool().getConnection();
 
         SeSqlConstruct sqlConstruct = new SeSqlConstruct();
         String[] tables = { InProcessViewSupportTestData.MASTER, InProcessViewSupportTestData.CHILD };
@@ -624,7 +624,7 @@ public class SDEJavaApiJoinTest extends TestCase {
         // final int shapeIndex = 5;
         final int expectedCount = 6;
 
-        SeQuery query = conn.createSeQuery();
+        SeQuery query = session.createSeQuery();
 
         SeQueryInfo queryInfo = new SeQueryInfo();
         queryInfo.setConstruct(sqlConstruct);
@@ -669,7 +669,7 @@ public class SDEJavaApiJoinTest extends TestCase {
             e.printStackTrace();
             throw e;
         } finally {
-            conn.close();
+            session.close();
         }
     }
 
@@ -682,9 +682,9 @@ public class SDEJavaApiJoinTest extends TestCase {
      * @throws Exception
      */
     public void testApiPlainSql() throws Exception {
-        Session conn = store.getConnectionPool().getConnection();
+        Session session = store.getConnectionPool().getConnection();
 
-        final SeQuery query = conn.createSeQuery();
+        final SeQuery query = session.createSeQuery();
         final String plainQuery = "SELECT " + InProcessViewSupportTestData.MASTER + ".ID, "
                 + InProcessViewSupportTestData.MASTER + ".SHAPE, "
                 + InProcessViewSupportTestData.CHILD + ".NAME  FROM "
@@ -711,7 +711,7 @@ public class SDEJavaApiJoinTest extends TestCase {
             e.printStackTrace();
             throw e;
         } finally {
-            conn.close();
+            session.close();
         }
     }
 

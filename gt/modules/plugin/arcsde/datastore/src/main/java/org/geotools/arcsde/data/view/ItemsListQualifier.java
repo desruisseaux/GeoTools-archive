@@ -45,37 +45,37 @@ class ItemsListQualifier implements ItemsListVisitor {
     ItemsList _qualifiedList;
 
     /** DOCUMENT ME! */
-    private Session conn;
+    private Session session;
 
     private Map tableAliases;
 
     /**
      * Creates a new ItemsListQualifier object.
      * 
-     * @param conn
+     * @param session
      *            DOCUMENT ME!
      */
-    public ItemsListQualifier(Session conn, Map tableAliases) {
-        this.conn = conn;
+    public ItemsListQualifier(Session session, Map tableAliases) {
+        this.session = session;
         this.tableAliases = tableAliases;
     }
 
     /**
      * DOCUMENT ME!
      * 
-     * @param conn
+     * @param session
      *            DOCUMENT ME!
      * @param items
      *            DOCUMENT ME!
      * 
      * @return DOCUMENT ME!
      */
-    public static ItemsList qualify(Session conn, Map tableAliases, ItemsList items) {
+    public static ItemsList qualify(Session session, Map tableAliases, ItemsList items) {
         if (items == null) {
             return null;
         }
 
-        ItemsListQualifier q = new ItemsListQualifier(conn, tableAliases);
+        ItemsListQualifier q = new ItemsListQualifier(session, tableAliases);
         items.accept(q);
 
         return q._qualifiedList;
@@ -88,7 +88,7 @@ class ItemsListQualifier implements ItemsListVisitor {
      *            DOCUMENT ME!
      */
     public void visit(SubSelect subSelect) {
-        SubSelect qualified = SubSelectQualifier.qualify(conn, subSelect);
+        SubSelect qualified = SubSelectQualifier.qualify(session, subSelect);
         this._qualifiedList = qualified;
     }
 
@@ -104,7 +104,7 @@ class ItemsListQualifier implements ItemsListVisitor {
 
         for (Iterator it = expressions.iterator(); it.hasNext();) {
             Expression exp = (Expression) it.next();
-            Expression qExp = ExpressionQualifier.qualify(conn, tableAliases, exp);
+            Expression qExp = ExpressionQualifier.qualify(session, tableAliases, exp);
 
             qualifiedList.add(qExp);
         }

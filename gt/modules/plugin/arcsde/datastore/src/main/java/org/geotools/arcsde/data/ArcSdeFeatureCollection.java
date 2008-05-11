@@ -64,7 +64,7 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
 
     private final Set<ArcSdeFeatureReaderIterator> openIterators;
 
-    private Session connection;
+    private Session session;
 
     private SimpleFeatureType childrenSchema;
 
@@ -83,14 +83,14 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
     @Override
     public final synchronized SimpleFeatureType getSchema() {
         if (childrenSchema == null) {
-            final Session conn = getLockedConnection();
+            final Session session = getLockedConnection();
             try {
                 final ArcSDEDataStore dataStore = featureSource.getDataStore();
                 DefaultQuery excludeFilterQuery = new DefaultQuery(this.query);
                 excludeFilterQuery.setFilter(Filter.EXCLUDE);
 
                 final FeatureReader<SimpleFeatureType, SimpleFeature> reader;
-                reader = dataStore.getFeatureReader(excludeFilterQuery, conn, false,
+                reader = dataStore.getFeatureReader(excludeFilterQuery, session, false,
                         ArcSdeVersionHandler.NONVERSIONED_HANDLER);
 
                 try {
@@ -114,11 +114,11 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
     @Override
     public final ReferencedEnvelope getBounds() {
         ReferencedEnvelope bounds;
-        final Session connection = getLockedConnection();
+        final Session session = getLockedConnection();
 
         LOGGER.info("Getting collection bounds");
         try {
-            bounds = featureSource.getBounds(query, connection);
+            bounds = featureSource.getBounds(query, session);
             if (bounds == null) {
                 LOGGER.info("FeatureSource returned null bounds, going to return an empty one");
                 bounds = new ReferencedEnvelope(getCRS());
@@ -140,9 +140,9 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
 
     @Override
     public final int getCount() throws IOException {
-        final Session connection = getLockedConnection();
+        final Session session = getLockedConnection();
         try {
-            return featureSource.getCount(query, connection);
+            return featureSource.getCount(query, session);
         } finally {
             unlockConnection();
             closeConnectionIfNeedBe();
@@ -163,7 +163,7 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
     }
 
     private static class ArcSdeFeatureReaderIterator extends FeatureReaderIterator<SimpleFeature> {
-        private Session connection;
+        private Session session;
 
         private final ArcSdeFeatureCollection parent;
 
@@ -171,21 +171,21 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
          * Grabs a lock over the connection for the iterator's life time (until close())
          * 
          * @param reader
-         * @param connection
+         * @param session
          * @param parent
          */
         public ArcSdeFeatureReaderIterator(final FeatureReader<SimpleFeatureType, SimpleFeature> reader,
-                                           final Session connection,
+                                           final Session session,
                                            final ArcSdeFeatureCollection parent) {
             super(reader);
-            connection.getLock().lock();
-            this.connection = connection;
+            session.getLock().lock();
+            this.session = session;
             this.parent = parent;
         }
 
         @Override
         public void close() {
-            if (connection == null) {
+            if (session == null) {
                 return;
             }
             // /connection.getLock().lock();
@@ -194,15 +194,15 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
                 super.close();
                 parent.releaseIterator(this);
             } finally {
-                connection.getLock().unlock();
+                session.getLock().unlock();
                 parent.closeConnectionIfNeedBe();
-                connection = null;
+                session = null;
             }
         }
 
         @Override
         public boolean hasNext() {
-            if (connection == null) {
+            if (session == null) {
                 throw new IllegalStateException("Iterator already closed");
             }
             ///connection.getLock().lock();
@@ -229,14 +229,14 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
      */
     @Override
     protected synchronized final Iterator<SimpleFeature> openIterator() throws IOException {
-        final Session connection = getLockedConnection();
+        final Session session = getLockedConnection();
 
         final FeatureReader<SimpleFeatureType, SimpleFeature> reader;
         try {
             final ArcSDEDataStore dataStore = featureSource.getDataStore();
             final ArcSdeVersionHandler versionHandler = featureSource.getVersionHandler();
             final boolean readerClosesConnection = false;
-            reader = dataStore.getFeatureReader(query, connection, readerClosesConnection,
+            reader = dataStore.getFeatureReader(query, session, readerClosesConnection,
                     versionHandler);
         } finally {
             unlockConnection();
@@ -249,7 +249,7 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
 
         final ArcSdeFeatureReaderIterator iterator;
         // give the itertor the connection unlocked, it will lock/unlock on a more granular basis
-        iterator = new ArcSdeFeatureReaderIterator(reader, connection, this);
+        iterator = new ArcSdeFeatureReaderIterator(reader, session, this);
         this.openIterators.add(iterator);
         return iterator;
     }
@@ -263,19 +263,19 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
      * @throws RuntimeException if the connection can't be acquired
      */
     private synchronized Session getLockedConnection() {
-        if (this.connection == null) {
+        if (this.session == null) {
             try {
-                connection = featureSource.getConnection();
+                session = featureSource.getConnection();
             } catch (IOException e) {
                 throw new RuntimeException("Can't acquire connection", e);
             }
         }
-        this.connection.getLock().lock();
-        return this.connection;
+        this.session.getLock().lock();
+        return this.session;
     }
 
     private synchronized void unlockConnection() {
-        connection.getLock().unlock();
+        session.getLock().unlock();
     }
 
     /**
@@ -287,11 +287,11 @@ public class ArcSdeFeatureCollection extends DataFeatureCollection {
     private synchronized void closeConnectionIfNeedBe() {
         if (openIterators.size() == 0) {
             // only close if its not already returned to the pool (ie, already closed)
-            if (!connection.isPassivated()) {
+            if (!session.isPassivated()) {
                 // and there's no a transaction being run over that connection
-                if (!connection.isTransactionActive()) {
-                    connection.close();
-                    connection = null;
+                if (!session.isTransactionActive()) {
+                    session.close();
+                    session = null;
                 }
             }
         }

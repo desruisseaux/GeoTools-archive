@@ -43,38 +43,38 @@ public class ColumnReferenceQualifier implements ColumnReferenceVisitor {
     private ColumnReference qualifiedReference;
 
     /** DOCUMENT ME! */
-    private Session conn;
+    private Session session;
 
     private Map tableAliases;
 
     /**
      * Creates a new ColumnReferenceQualifier object.
      * 
-     * @param conn
+     * @param session
      *            DOCUMENT ME!
      */
-    private ColumnReferenceQualifier(Session conn, Map tableAliases) {
-        this.conn = conn;
+    private ColumnReferenceQualifier(Session session, Map tableAliases) {
+        this.session = session;
         this.tableAliases = tableAliases;
     }
 
     /**
      * DOCUMENT ME!
      * 
-     * @param conn
+     * @param session
      *            DOCUMENT ME!
      * @param colRef
      *            DOCUMENT ME!
      * 
      * @return DOCUMENT ME!
      */
-    public static ColumnReference qualify(Session conn, Map tableAliases,
+    public static ColumnReference qualify(Session session, Map tableAliases,
             ColumnReference colRef) {
         if (colRef == null) {
             return null;
         }
 
-        ColumnReferenceQualifier qualifier = new ColumnReferenceQualifier(conn, tableAliases);
+        ColumnReferenceQualifier qualifier = new ColumnReferenceQualifier(session, tableAliases);
         colRef.accept(qualifier);
 
         return qualifier.qualifiedReference;
@@ -97,6 +97,6 @@ public class ColumnReferenceQualifier implements ColumnReferenceVisitor {
      *            DOCUMENT ME!
      */
     public void visit(Column column) {
-        this.qualifiedReference = ColumnQualifier.qualify(conn, tableAliases, column);
+        this.qualifiedReference = ColumnQualifier.qualify(session, tableAliases, column);
     }
 }

@@ -42,11 +42,11 @@ public class ArcSDEMinimalDataStore extends ArcSDEDataStore {
     
     protected synchronized FeatureTypeInfo getFeatureTypeInfo( String typeName, ArcSDEConnectionPool pool ) throws IOException {
         final ArcSDEConnectionReference reference = (ArcSDEConnectionReference) pool;
-        final Session conn = reference.getConnection( Transaction.AUTO_COMMIT ); // we are doing the read only thing
+        final Session session = reference.getConnection( Transaction.AUTO_COMMIT ); // we are doing the read only thing
         try {
-            return getFeatureTypeInfo(typeName, conn );
+            return getFeatureTypeInfo(typeName, session );
         } finally {
-            conn.close();
+            session.close();
         }
     }
 }

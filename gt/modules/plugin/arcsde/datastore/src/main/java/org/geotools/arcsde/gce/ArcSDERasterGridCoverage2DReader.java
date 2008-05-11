@@ -258,7 +258,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
             Rectangle requestedDim,
             Integer forcedLevel) throws IOException {
 
-        Session scon = null;
+        Session session = null;
         try {
 
             if (LOGGER.isLoggable(Level.INFO))
@@ -312,10 +312,10 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
                 RasterQueryInfo rasterGridInfo = pyramidInfo.fitExtentToRasterPixelGrid(reqEnv,
                         level);
 
-                scon = connectionPool.getConnection();
+                session = connectionPool.getConnection();
 
                 ArcSDERasterImageReadParam rParam = new ArcSDERasterImageReadParam();
-                rParam.setConnection(scon);
+                rParam.setConnection(session);
 
                 outputImage = createInitialBufferedImage(rasterGridInfo.image.width,
                         rasterGridInfo.image.height);
@@ -457,8 +457,8 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
                 LOGGER.log(Level.SEVERE, uce.getLocalizedMessage(), uce);
             throw new DataSourceException(uce);
         } finally {
-            if (scon != null)
-                scon.close();
+            if (session != null)
+                session.close();
         }
     }
 
@@ -549,10 +549,10 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
             throw new DataSourceException("Raster Attributes are null, can't calculated CRS info.");
         }
 
-        Session con = null;
+        Session session = null;
         try {
-            con = connectionPool.getConnection();
-            SeRasterColumn rCol = con.createSeRasterColumn(rasterAttributes.getRasterColumnId());
+            session = connectionPool.getConnection();
+            SeRasterColumn rCol = session.createSeRasterColumn(rasterAttributes.getRasterColumnId());
 
             PeProjectedCS pcs = new PeProjectedCS(rCol.getCoordRef().getProjectionDescription());
             epsgCode = -1;
@@ -597,8 +597,8 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
             LOGGER.log(Level.SEVERE, "", e);
             throw new DataSourceException(e);
         } finally {
-            if (con != null && !con.isClosed())
-                con.close();
+            if (session != null && !session.isClosed())
+                session.close();
         }
     }
 
@@ -659,9 +659,9 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
         connectionPool = ArcSDEConnectionPoolFactory.getInstance().createPool(sdeConfig);
 
         try {
-            Session scon = connectionPool.getConnection();
+            Session session = connectionPool.getConnection();
 
-            SeTable sTable = scon.getTable(rasterTable);
+            SeTable sTable = session.getTable(rasterTable);
             SeQuery q = null;
             try {
                 SeColumnDefinition[] cols = sTable.describe();
@@ -675,7 +675,7 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
                             "Couldn't find any TYPE_RASTER columns in ArcSDE table " + rasterTable);
 
                 rasterColumns = (String[]) fetchColumns.toArray(new String[fetchColumns.size()]);
-                q = scon.createSeQuery(rasterColumns, new SeSqlConstruct(rasterTable));
+                q = session.createSeQuery(rasterColumns, new SeSqlConstruct(rasterTable));
                 q.prepareQuery();
                 q.execute();
 
@@ -687,8 +687,8 @@ public final class ArcSDERasterGridCoverage2DReader extends AbstractGridCoverage
                 throw new DataSourceException("Error fetching raster connection data from "
                         + rasterTable + ": " + se.getSeError().getErrDesc(), se);
             } finally {
-                if (!scon.isClosed())
-                    scon.close();
+                if (!session.isClosed())
+                    session.close();
             }
 
         } catch (UnavailableArcSDEConnectionException uce) {

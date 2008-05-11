@@ -192,7 +192,7 @@ public class ArcSDERasterReader extends ImageReader {
                     + " to " + maxTileX + "," + maxTileY + " in level " + imageIndex + ")");
 
         // Now we do the actual reading from SDE.
-        Session scon = sdeirp.getConnection();
+        Session session = sdeirp.getConnection();
         SeQuery query = null;
         BufferedImage destination;
 
@@ -201,7 +201,7 @@ public class ArcSDERasterReader extends ImageReader {
             // one gets SDE Raster output. First, query the
             // database for the single row in the raster business table.
             // FIXME: Raster catalogs need to specify what their row number is.
-            query = scon.createSeQuery(new String[] { _rasterColumn }, new SeSqlConstruct(
+            query = session.createSeQuery(new String[] { _rasterColumn }, new SeSqlConstruct(
                     _rasterTable));
             query.prepareQuery();
             query.execute();

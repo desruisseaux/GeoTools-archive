@@ -167,14 +167,14 @@ public class GeometryBuilderTest extends TestCase {
     public void testInsertGeometries(Geometry[] original, TestData testData) throws Exception {
         testData.truncateTempTable();
         SeLayer layer = testData.getTempLayer();
-        Session conn = testData.getConnectionPool().getConnection();
+        Session session = testData.getConnectionPool().getConnection();
 
         Geometry[] fetched = new Geometry[original.length];
         try {
-            testData.insertData(original, layer, conn.unWrap());
+            testData.insertData(original, layer, session.unWrap());
 
             SeSqlConstruct sqlCons = new SeSqlConstruct(layer.getName());
-            SeQuery query = conn.createSeQuery(new String[] { "SHAPE" }, sqlCons);
+            SeQuery query = session.createSeQuery(new String[] { "SHAPE" }, sqlCons);
             query.prepareQuery();
             query.execute();
             SeRow row;
@@ -191,7 +191,7 @@ public class GeometryBuilderTest extends TestCase {
             }
             query.close();
         } finally {
-            conn.close();
+            session.close();
         }
 
         for (int i = 0; i < fetched.length; i++) {

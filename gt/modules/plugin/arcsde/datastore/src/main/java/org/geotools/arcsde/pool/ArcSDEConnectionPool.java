@@ -274,13 +274,13 @@ public class ArcSDEConnectionPool {
      * its best to get it out of the pool as soon as you release your hold on
      * it.
      * 
-     * @param conn
+     * @param session
      */
-    public synchronized void markConnectionAsFailed(Session conn) {
-        LOGGER.warning("ArcSDE connection '" + conn
+    public synchronized void markConnectionAsFailed(Session session) {
+        LOGGER.warning("ArcSDE connection '" + session
                 + "' has been marked as failed.  Current pool state is " + getAvailableCount()
                 + " avail/" + this.getPoolSize() + " total");
-        seConnectionFactory.markObjectInvalid(conn);
+        seConnectionFactory.markObjectInvalid(session);
     }
 
     /**
@@ -293,12 +293,12 @@ public class ArcSDEConnectionPool {
      */
     @SuppressWarnings("unchecked")
     public List<String> getAvailableLayerNames() throws DataSourceException {
-        Session conn = null;
+        Session session = null;
 
         List<String> layerNames = new LinkedList<String>();
         try {
-            conn = getConnection();
-            for (Iterator<SeLayer> it = conn.getLayers().iterator(); it.hasNext();) {
+            session = getConnection();
+            for (Iterator<SeLayer> it = session.getLayers().iterator(); it.hasNext();) {
                 layerNames.add(it.next().getQualifiedName());
             }
         } catch (SeException ex) {
@@ -308,8 +308,8 @@ public class ArcSDEConnectionPool {
         } catch (UnavailableArcSDEConnectionException ex) {
             throw new DataSourceException("No free connection found to query the layers list", ex);
         } finally {
-            if (conn != null)
-                conn.close();
+            if (session != null)
+                session.close();
         }
         return layerNames;
     }

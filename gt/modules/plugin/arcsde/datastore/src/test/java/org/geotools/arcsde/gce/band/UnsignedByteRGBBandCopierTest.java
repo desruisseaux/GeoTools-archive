@@ -50,12 +50,12 @@ public class UnsignedByteRGBBandCopierTest {
     public void testLiveRGBRasterTile() throws Exception {
         final String tableName = rasterTestData.getRGBRasterTableName();
 
-        Session scon = null;
+        Session session = null;
         try {
             ArcSDEConnectionPool pool = rasterTestData.getTestData().getConnectionPool();
 
-            scon = pool.getConnection();
-            SeQuery q = scon
+            session = pool.getConnection();
+            SeQuery q = session
                     .createSeQuery(new String[] { "RASTER" }, new SeSqlConstruct(tableName));
             q.prepareQuery();
             q.execute();
@@ -92,8 +92,8 @@ public class UnsignedByteRGBBandCopierTest {
         } catch (SeException se) {
             LOGGER.log(Level.SEVERE, se.getSeError().getErrDesc(), se);
         } finally {
-            if (scon != null)
-                scon.close();
+            if (session != null)
+                session.close();
         }
     }
 
