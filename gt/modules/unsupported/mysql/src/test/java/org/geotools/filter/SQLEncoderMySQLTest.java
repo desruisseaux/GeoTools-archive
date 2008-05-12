@@ -15,27 +15,26 @@
  */
 package org.geotools.filter;
 
+import java.util.logging.Logger;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import java.util.logging.Logger;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
 
 import org.geotools.data.jdbc.FilterToSQLException;
 import org.geotools.data.jdbc.fidmapper.BasicFIDMapper;
 import org.geotools.data.jdbc.fidmapper.TypedFIDMapper;
-import org.geotools.feature.AttributeTypeBuilder;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.GeometryDescriptor;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * Unit test for SQLEncoderPostgis. This is a complimentary test suite with the
@@ -49,9 +48,6 @@ public class SQLEncoderMySQLTest extends TestCase {
     /** Standard logging instance */
     protected static final Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger("org.geotools.filter");
-
-    // protected static AttributeTypeFactory attFactory =
-    // AttributeTypeFactory.defaultInstance();
 
     /** Schema on which to preform tests */
     protected static SimpleFeatureType testSchema = null;
@@ -223,7 +219,7 @@ public class SQLEncoderMySQLTest extends TestCase {
         String out = encoder.encodeToString(compFilter);
         LOGGER.fine("Resulting SQL filter is \n" + out);
 
-        assertEquals("WHERE testInteger = 5.0", out);
+        assertEquals("WHERE testInteger = 5", out);
     }
 
     public void testException() throws Exception {
