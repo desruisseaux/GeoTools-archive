@@ -284,8 +284,8 @@ public class StyledShapePainter {
                 }
 
                 double rotation = -(theta - (Math.PI / 2d));
-                double x = previous[0] + (dx / 2.0);
-                double y = previous[1] + (dy / 2.0);
+                double x = previous[0] + dx;
+                double y = previous[1] + dy;
 
                 if (LOGGER.isLoggable(Level.FINEST)) {
                     LOGGER.finest("len =" + len + " imageSize " + imageSize);
@@ -294,8 +294,12 @@ public class StyledShapePainter {
                 double dist = 0;
 
                 for (dist = 0; dist < (len - imageSize); dist += imageSize) {
-                    /*graphic.drawImage(image2,(int)x-midx,(int)y-midy,null); */
                     renderImage(graphics, x, y, image, rotation, 1);
+                    
+//                  Use this code to visually debug the x,y used to draw the image
+//                  graphics.setColor(Color.BLACK);
+//                  graphics.setStroke(new BasicStroke());
+//                  graphics.draw(new Line2D.Double(x, y, x, y));
 
                     x += dx;
                     y += dy;
@@ -307,7 +311,7 @@ public class StyledShapePainter {
                 }
 
                 double remainder = len - dist;
-                int remainingWidth = (int) remainder;
+                int remainingWidth = (int) Math.round(remainder);
 
                 if (remainingWidth > 0) {
                     //clip and render image
@@ -315,8 +319,11 @@ public class StyledShapePainter {
                         LOGGER.finest("about to use clipped image " + remainder);
                     }
 
-                    BufferedImage img = new BufferedImage(remainingWidth,
-                            imageSize, image.getType());
+                    // the +2 is a magic number. That is, I don't know exactly
+                    // where it comes from, but closing images always seem to be missing
+                    // two pixels...
+                    BufferedImage img = new BufferedImage(remainingWidth + 2,
+                            image.getHeight(), image.getType());
                     Graphics2D ig = img.createGraphics();
                     ig.drawImage(image, 0, 0, imgObserver);
 
@@ -354,10 +361,10 @@ public class StyledShapePainter {
 
         AffineTransform temp = graphics.getTransform();
         AffineTransform markAT = new AffineTransform();
-        Point2D mapCentre = new java.awt.geom.Point2D.Double(x, y);
-        Point2D graphicCentre = new java.awt.geom.Point2D.Double();
-        temp.transform(mapCentre, graphicCentre);
-        markAT.translate(graphicCentre.getX(), graphicCentre.getY());
+        Point2D leftMid = new java.awt.geom.Point2D.Double(x, y);
+        Point2D pointTx = new java.awt.geom.Point2D.Double();
+        temp.transform(leftMid, pointTx);
+        markAT.translate(pointTx.getX(), pointTx.getY());
 
         double shearY = temp.getShearY();
         double scaleY = temp.getScaleY();
@@ -374,7 +381,10 @@ public class StyledShapePainter {
                 AlphaComposite.SRC_OVER, opacity));
 
         // we moved the origin to the centre of the image.
-        graphics.drawImage(image, -image.getWidth(imgObserver) / 2,
+        // -1 is a magic number, but various tests show that images
+        // are always drawn one pixel after the start of the line without
+        // it
+        graphics.drawImage(image, -1,
             -image.getHeight(imgObserver) / 2, imgObserver);
 
         graphics.setTransform(temp);
