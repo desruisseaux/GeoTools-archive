@@ -21,15 +21,16 @@ import java.util.Map;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
- * Sets attribute values for grid elements when constructing a vector grid.
+ * Controls the creating of features representing grid elements during vector
+ * grid construction.
  * <pre><code>
- * AttributeSetter setter = new AttributeSetter(myFeatureType) {
- *     private int id = 1;
+ * GridFeatureBuilder builder = new GridFeatureBuilder(myFeatureType) {
+ *     private int id = 0;
  *
  *     public setAttributes(GridElement el, Map<String, Object> attributes) {
  *         // assumes "id" and "value" are valid property names for
  *         // the feature type
- *         attributes.put("id", id++);
+ *         attributes.put("id", ++id);
  *         attributes.put("value", myValueGettingFunction(el.toPolygon()));
  *     }
  * };
@@ -40,20 +41,24 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @source $URL$
  * @version $Id$
  */
-public abstract class AttributeSetter {
+public abstract class GridFeatureBuilder {
+
+    /** Default name for the geometry attribute: "element" */
+    public static final String DEFAULT_GEOMETRY_ATTRIBUTE_NAME = "element";
+
     protected final SimpleFeatureType type;
 
     /**
-     * Creates an {@code AttributeSetter} to work with the given feature type.
+     * Creates an {@code GridFeatureBuilder} to work with the given feature type.
      *
      * @param type the feature type
      */
-    public AttributeSetter(SimpleFeatureType type) {
+    public GridFeatureBuilder(SimpleFeatureType type) {
         this.type = type;
     }
 
     /**
-     * Gets the feature type used by this {@code AttributeSetter}.
+     * Gets the feature type used by this {@code GridFeatureBuilder}.
      *
      * @return the feature type
      */
@@ -76,7 +81,7 @@ public abstract class AttributeSetter {
     public abstract void setAttributes(GridElement el, Map<String, Object> attributes);
 
     /**
-     * Sets the {@code FeatureID} as a {@code String} for a new {@code SimpleFeature}
+     * Gets the {@code FeatureID} as a {@code String} for a new {@code SimpleFeature}
      * being constructed from the given {@code GridElement}.
      * <p>
      * It is optional to override this method. The base implementation returns
@@ -84,10 +89,27 @@ public abstract class AttributeSetter {
      *
      * @param el the element from which the new feature is being constructed
      *
-     * @return a feature ID value
+     * @return value to use as the feature ID
      */
     public String getFeatureID(GridElement el) {
         return null;
+    }
+
+    /**
+     * Tests whether a feature will be constructed for the given {@code GridElement}.
+     * This can be overriden to create vector grids with 'holes' where elements are not
+     * required, for example, based on location or the results of intersection with
+     * other data layers.
+     * <p>
+     * The base implementation always returns {@code true}.
+     *
+     * @param el the element from which the new feature would be constructed
+     *
+     * @return {@code true} to create a feature for the element; {@code false}
+     *         to skip the element.
+     */
+    public boolean getCreateFeature(GridElement el) {
+        return true;
     }
 
 }
