@@ -27,7 +27,6 @@ import java.util.Set;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DefaultServiceInfo;
-import org.geotools.data.FeatureLocking;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.FeatureWriter;
@@ -40,7 +39,6 @@ import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.FeatureTypes;
 import org.geotools.feature.NameImpl;
-import org.geotools.feature.SchemaException;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
@@ -51,8 +49,8 @@ public class DirectoryDataStore implements DataStore {
     DirectoryTypeCache cache;
     DirectoryLockingManager lm;
     
-    public DirectoryDataStore(File directory, URI namespaceURI) throws IOException {
-        cache = new DirectoryTypeCache(directory, namespaceURI);
+    public DirectoryDataStore(File directory, FileStoreFactory dialect) throws IOException {
+        cache = new DirectoryTypeCache(directory, dialect);
     }
 
     public FeatureReader<SimpleFeatureType, SimpleFeature> getFeatureReader(
@@ -65,11 +63,11 @@ public class DirectoryDataStore implements DataStore {
             String typeName) throws IOException {
         SimpleFeatureSource fs = getDataStore(typeName).getFeatureSource(typeName);
         if(fs instanceof SimpleFeatureLocking) {
-            return new DirectoryFeatureLocking((SimpleFeatureLocking) fs, this);
+            return new DirectoryFeatureLocking((SimpleFeatureLocking) fs);
         } else if(fs instanceof FeatureStore) {
-            return new DirectoryFeatureStore((SimpleFeatureStore) fs, this);
+            return new DirectoryFeatureStore((SimpleFeatureStore) fs);
         } else {
-            return new DirectoryFeatureSource((SimpleFeatureSource) fs, this);
+            return new DirectoryFeatureSource((SimpleFeatureSource) fs);
         }
     }
 
@@ -165,6 +163,12 @@ public class DirectoryDataStore implements DataStore {
         updateSchema(typeName.getLocalPart(), featureType);
     }
     
+    /**
+     * Returns the native store for a specified type name
+     * @param typeName
+     * @return
+     * @throws IOException
+     */
     public DataStore getDataStore(String typeName) throws IOException {
         // grab the store for a specific feature type, making sure it's actually there
         DataStore store = cache.getDataStore(typeName, true);

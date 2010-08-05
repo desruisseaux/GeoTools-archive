@@ -33,15 +33,12 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 
-class DirectoryFeatureSource implements SimpleFeatureSource {
+public class DirectoryFeatureSource implements SimpleFeatureSource {
     SimpleFeatureSource fsource;
-    DirectoryDataStore dataStore;
     
     public DirectoryFeatureSource(
-            SimpleFeatureSource delegate,
-            DirectoryDataStore dataStore) {
+            SimpleFeatureSource delegate) {
         this.fsource = delegate;
-        this.dataStore = dataStore;
     }
 
     public void addFeatureListener(FeatureListener listener) {
@@ -61,7 +58,8 @@ class DirectoryFeatureSource implements SimpleFeatureSource {
     }
 
     public DataAccess<SimpleFeatureType, SimpleFeature> getDataStore() {
-        return dataStore;
+        // this is done on purpose to avoid crippling the shapefile renderer optimizations
+        return fsource.getDataStore();
     }
 
     public SimpleFeatureCollection getFeatures()
@@ -103,6 +101,8 @@ class DirectoryFeatureSource implements SimpleFeatureSource {
         fsource.removeFeatureListener(listener);
     }
 
-    
+    public SimpleFeatureSource unwrap() {
+        return fsource;
+    }
     
 }

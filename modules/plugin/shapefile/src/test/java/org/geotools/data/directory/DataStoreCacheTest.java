@@ -6,10 +6,11 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.Arrays;
 
+import org.geotools.data.directory.DirectoryTypeCache;
 import org.junit.Test;
 
 
-public class DataStoreCacheTest extends TestSupport {
+public class DataStoreCacheTest extends DirectoryTestSupport {
     
     private static final String DESTDIR = "shapes";
     // we need a long delay for builds under UNIX, the timestap is coarse
@@ -18,25 +19,22 @@ public class DataStoreCacheTest extends TestSupport {
 
     @Test
     public void testInitialization() throws Exception {
-        copyFile("Bridges.properties", DESTDIR);
-        copyFile("Buildings.properties", DESTDIR);
         copyShapefiles("shapes/archsites.shp");
         File f = copyShapefiles("shapes/bugsites.shp");
         tempDir = f.getParentFile();
         
-        DirectoryTypeCache cache = new DirectoryTypeCache(tempDir, NSURI);
-        assertEquals(4, cache.getTypeNames().size());
+        DirectoryTypeCache cache = new DirectoryTypeCache(tempDir, getFileStoreFactory());
+        System.out.println(cache.getTypeNames());
+        assertEquals(2, cache.getTypeNames().size());
         assertTrue(cache.getTypeNames().contains("archsites"));
         assertTrue(cache.getTypeNames().contains("bugsites"));
-        assertTrue(cache.getTypeNames().contains("Bridges"));
-        assertTrue(cache.getTypeNames().contains("Buildings"));
     }
     
     @Test
     public void testAddNewDataStore() throws Exception {
         File f = copyShapefiles("shapes/bugsites.shp");
         tempDir = f.getParentFile();
-        DirectoryTypeCache cache = new DirectoryTypeCache(tempDir, NSURI);
+        DirectoryTypeCache cache = new DirectoryTypeCache(tempDir, getFileStoreFactory());
         
         assertEquals(1, cache.getTypeNames().size());
         assertTrue(cache.getTypeNames().contains("bugsites"));
@@ -55,7 +53,7 @@ public class DataStoreCacheTest extends TestSupport {
         File f = copyShapefiles("shapes/bugsites.shp");
         copyShapefiles("shapes/archsites.shp");
         tempDir = f.getParentFile();
-        DirectoryTypeCache cache = new DirectoryTypeCache(tempDir, NSURI);
+        DirectoryTypeCache cache = new DirectoryTypeCache(tempDir, getFileStoreFactory());
         
         assertEquals(2, cache.getTypeNames().size());
         assertTrue(cache.getTypeNames().contains("bugsites"));
@@ -74,37 +72,37 @@ public class DataStoreCacheTest extends TestSupport {
     
     @Test
     public void testRemoveType() throws Exception {
-        copyFile("Bridges.properties", DESTDIR);
-        File f = copyFile("Buildings.properties", DESTDIR);
+        File f = copyShapefiles("shapes/bugsites.shp");
+        copyShapefiles("shapes/archsites.shp");
         tempDir = f.getParentFile();
-        DirectoryTypeCache cache = new DirectoryTypeCache(tempDir, NSURI);
+        DirectoryTypeCache cache = new DirectoryTypeCache(tempDir, getFileStoreFactory());
         assertEquals(2, cache.getTypeNames().size());
-        assertTrue(cache.getTypeNames().contains("Bridges"));
-        assertTrue(cache.getTypeNames().contains("Buildings"));
+        assertTrue(cache.getTypeNames().contains("archsites"));
+        assertTrue(cache.getTypeNames().contains("bugsites"));
         
         // give the os some time, the directory last modification
         // time has a os specific time resolution
         Thread.sleep(DELAY);
-        assertTrue(new File(tempDir, "Buildings.properties").delete());
+        assertTrue(new File(tempDir, "archsites.shp").delete());
         assertEquals(1, cache.getTypeNames().size());
-        assertTrue(cache.getTypeNames().contains("Bridges"));
+        assertTrue(cache.getTypeNames().contains("bugsites"));
     }
     
     @Test
     public void testAddType() throws Exception {
-        File f = copyFile("Buildings.properties", DESTDIR);
+        File f = copyShapefiles("shapes/bugsites.shp");
         tempDir = f.getParentFile();
-        DirectoryTypeCache cache = new DirectoryTypeCache(tempDir, NSURI);
+        DirectoryTypeCache cache = new DirectoryTypeCache(tempDir, getFileStoreFactory());
         assertEquals(1, cache.getTypeNames().size());
-        assertTrue(cache.getTypeNames().contains("Buildings"));
+        assertTrue(cache.getTypeNames().contains("bugsites"));
         
         // give the os some time, the directory last modification
         // time has a os specific time resolution
         Thread.sleep(DELAY);
-        copyFile("Bridges.properties", DESTDIR);
+        copyShapefiles("shapes/archsites.shp");
         assertEquals(2, cache.getTypeNames().size());
-        assertTrue(cache.getTypeNames().contains("Bridges"));
-        assertTrue(cache.getTypeNames().contains("Buildings"));
+        assertTrue(cache.getTypeNames().contains("bugsites"));
+        assertTrue(cache.getTypeNames().contains("archsites"));
     }
 
 }

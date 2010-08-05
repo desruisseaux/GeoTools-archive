@@ -66,11 +66,6 @@ class DirectoryTypeCache {
     File directory;
 
     /**
-     * The target namespace
-     */
-    URI namespaceURI;
-
-    /**
      * The watcher, which is used to tell when the type cache is stale
      * and needs updating
      */
@@ -80,6 +75,11 @@ class DirectoryTypeCache {
      * A lock used for isolating cache updates
      */
     ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+    /**
+     * Will create the delegate stores
+     */
+    FileStoreFactory factory;
     
     /**
      * Builds a new cache.
@@ -88,7 +88,7 @@ class DirectoryTypeCache {
      *            a non null File pointing to an existing directory
      * @throws IOException
      */
-    DirectoryTypeCache(File directory, URI namespaceURI) throws IOException {
+    DirectoryTypeCache(File directory, FileStoreFactory factory) throws IOException {
         // some basic checks
         if (directory == null)
             throw new NullPointerException(
@@ -107,7 +107,7 @@ class DirectoryTypeCache {
         }
         
         this.directory = directory;
-        this.namespaceURI = namespaceURI;
+        this.factory = factory;
 
         this.watcher = new ImmediateDirectoryWatcher(directory);
     }
@@ -223,87 +223,31 @@ class DirectoryTypeCache {
 
         // build support structure used to quickly find files that need updating
         Map<File, FileEntry> fileCache = new HashMap<File, FileEntry>();
-        Set<FileEntry> dirCache = new HashSet<FileEntry>();
         for (FileEntry entry : ftCache.values()) {
-            if(!entry.file.isDirectory())
-                fileCache.put(entry.file, entry);
-            else
-                dirCache.add(entry);
+            fileCache.put(entry.file, entry);
         }
         
-        // grab all the factories that can look like file data store ones
-        List<FactoryAdapter> factories = lookupFileDataStores();
-        LOGGER.log(Level.FINE, "Found the following file capable factories: {0}", factories);
-        
-        // grab all the files we have to check and scan them with a 
-        // reduction algorithm, each time you find what a file is for, 
-        // remove it from the list
-        TreeSet<File> files = new TreeSet<File>(Arrays.asList(directory
-                .listFiles(new DirectoryFilter())));
-        
-        // first scan the factories that can deal with the whole directory (there
-        // may be more than one for the same root directory, we cannot assume
-        // one factory per file)
-        for (FactoryAdapter factoryAdapter : factories) {
-            DataStore store = factoryAdapter.getStore(directory, namespaceURI);
-            if(store != null) {
-                // do we have the same datastore in the current cache?
-                FileEntry entry = null;
-                for (FileEntry cachedEntry : dirCache) {
-                    if(cachedEntry.getStore(true).getClass().equals(store.getClass())) {
-                        entry = cachedEntry;
-                        break;
-                    }
-                }
-                
-                // if not found, then create a new one
-                if(entry == null) {
-                    entry = new FileEntry(directory, factoryAdapter, store);
-                }
-                
-                // if we have an entry, then grab all the feature types in it
-                // and build the corresponding entries in the ft cache
-                if (entry != null) {
-                    for (String typeName : entry.getStore(true).getTypeNames()) {
-                        // don't override existing entries
-                        if (!result.containsKey(typeName))
-                            result.put(typeName, entry);
-                        else {
-                            LOGGER.log(Level.WARNING, "Type name " + typeName
-                                    + " is available from multiple datastores");
-                        }
-                    }
-
-                    // TODO: remember to remove other files that have been grabbed
-                    // by a certain feature type when the FileDataStore interface is up
+        // grab all the candidate files
+        for (File file : directory.listFiles()) {
+            // skip over directories, we don't recurse
+            if(file.isDirectory()) {
+                continue;
+            }
+            
+            // do we have the same datastore in the current cache? If so keep it, we don't
+            // want to rebuild over and over the same stores
+            FileEntry entry = fileCache.get(file);
+            
+            // if missing build a new one
+            if(entry == null) {
+                DataStore store = factory.getDataStore(file);
+                if(store != null) {
+                    entry = new FileEntry(file, store);
                 }
             }
-        }
-
-        // the scan each file assuming there is only one datastore capable of handling it
-        while (!files.isEmpty()) {
-            File curr = files.first();
-
-            // cache check
-            FileEntry entry = fileCache.get(curr);
-            if (entry == null) {
-                // look for datastore
-                DataStore store = null;
-                FactoryAdapter adapter = null;
-                for (FactoryAdapter factoryAdapter : factories) {
-                    adapter = factoryAdapter;
-                    store = factoryAdapter.getStore(curr, namespaceURI);
-                    if (store != null)
-                        break;
-                }
-                if (store != null) {
-                    entry = new FileEntry(curr, adapter, store);
-                }
-            }
-
-            // if we have an entry, then grab all the feature types in it
-            // and build the corresponding entries in the ft cache
-            if (entry != null) {
+            
+            // if we managed to build an entry collect its feature types
+            if(entry != null) {
                 for (String typeName : entry.getStore(true).getTypeNames()) {
                     // don't override existing entries
                     if (!result.containsKey(typeName))
@@ -313,16 +257,7 @@ class DirectoryTypeCache {
                                 + " is available from multiple datastores");
                     }
                 }
-
-                // TODO: remember to remove other files that have been grabbed
-                // by a certain feature type when the FileDataStore interface is up
-            } else {
-                LOGGER.log(Level.FINE, "Could not find any datastore able to process {0}", curr);
             }
-
-            // move on
-            files.remove(curr);
-            continue;
         }
         
         // update the cache. We need to remove the missing elements, disposing
@@ -332,18 +267,16 @@ class DirectoryTypeCache {
         // hinder users of live data stores since we are not going to touch
         // the ones that are not being removed (the ones that we are going to
         // remove should be not working anyways)
-        Set<String> removed = new HashSet<String>(ftCache.keySet());
-        removed.removeAll(result.keySet());
+        Set<String> removedFTs = new HashSet<String>(ftCache.keySet());
+        removedFTs.removeAll(result.keySet());
         
         // collect all data stores that are referred by a feature type that we 
         // are going to remove, but are not referred by any feature type we're
         // going to keep. Clean the ftCache from removed feature types at the same
         // time.
         Set<FileEntry> disposable = new HashSet<FileEntry>(); 
-        for (String removedFT : removed) {
-            FileEntry entry = ftCache.get(removedFT);
-            disposable.add(entry);
-            ftCache.remove(removedFT);
+        for (String removedFT : removedFTs) {
+            disposable.add(ftCache.remove(removedFT));
         }
         for (FileEntry entry : result.values()) {
             disposable.remove(entry);
@@ -379,10 +312,6 @@ class DirectoryTypeCache {
                 LOGGER.fine("DataStore factory " + factory + " returns null from getParametersInfo!");
                 continue;
             }
-            
-            // avoid self loop
-            if(factory instanceof DirectoryDataStoreFactory)
-                continue;
             
             Param fileParam = null;
             Param nsParam = null;
@@ -437,18 +366,15 @@ class DirectoryTypeCache {
 
         SoftReference<DataStore> ref;
         
-        FactoryAdapter adapter;
-
-        public FileEntry(File file, FactoryAdapter adapter, DataStore store) {
+        public FileEntry(File file, DataStore store) {
             this.file = file;
-            this.adapter = adapter;
-            this.ref = new DataStoreSoftReference(store);
+            ref = new DataStoreSoftReference(store);
         }
         
         DataStore getStore(boolean force) throws IOException {
             DataStore store = ref != null ? ref.get() : null;
             if(store == null && force) {
-                store = adapter.getStore(file, namespaceURI);
+                store = factory.getDataStore(file);
                 ref = new DataStoreSoftReference(store);
             } 
             return store;
