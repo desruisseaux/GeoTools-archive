@@ -89,7 +89,7 @@ public class SVGGraphicFactory implements ExternalGraphicFactory {
         if(svg == null) {
             String parser = XMLResourceDescriptor.getXMLParserClassName();
             SAXSVGDocumentFactory f = new SAXSVGDocumentFactory(parser);
-            Document doc = f.createDocument(url.toString());
+            Document doc = f.createDocument(svgfile.toString());
             svg = new RenderableSVG(doc);
             glyphCache.put(svgfile, svg);
         }
